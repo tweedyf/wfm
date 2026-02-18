@@ -112,10 +112,10 @@ func footer(w http.ResponseWriter) {
 		};
 		upload(0);
 	}
-	document.body.addEventListener("dragover",onDragOver);
-	document.body.addEventListener("dragenter",onDragOver);
-	document.body.addEventListener("dragleave",onDragLeave);
-	document.body.addEventListener("drop",onDrop);
+	document.addEventListener("dragover",onDragOver);
+	document.addEventListener("dragenter",onDragOver);
+	document.addEventListener("dragleave",onDragLeave);
+	document.addEventListener("drop",onDrop);
 })();
 </SCRIPT>
 </FORM></BODY></HTML>
