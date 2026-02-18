@@ -38,6 +38,11 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	fs := wfmFs
+	if uName != "" && uName != "n/a" {
+		fs = afero.NewBasePathFs(fs, uName)
+	}
+
 	wfm := &wfmRequest{
 		userName: uName,
 		rwAccess: uAccess,
@@ -47,7 +52,7 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 		modern: func() bool {
 			return strings.HasPrefix(r.UserAgent(), "Mozilla/5") && r.Header.Get("Accept-Charset") == ""
 		}(),
-		fs:   wfmFs, // TODO(tenox): per user FS/homedir
+		fs:   fs,
 		uFbn: filepath.Base(unescapeOrEmpty(r.FormValue("file"))),
 		uDir: filepath.Clean(unescapeOrEmpty(r.FormValue("dir"))),
 	}
