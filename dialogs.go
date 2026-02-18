@@ -1,26 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"html"
 	"runtime"
-	"strings"
 
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/afero"
 )
-
-func selOpt(s string, f ...struct{ v, n string }) string {
-	var o []string
-	var m = make(map[string]string)
-	m[s] = "selected"
-	m[""] = "disabled"
-	for _, i := range f {
-		o = append(o, fmt.Sprintf("<option value=\"%v\" %v>%v</option>", html.EscapeString(i.v), m[i.v], html.EscapeString(i.n)))
-	}
-	return strings.Join(o, "\n")
-}
 
 func (r *wfmRequest) prompt(action string, mul []string) {
 	header(r.w, r.uDir, r.eSort, "", r.modern)
@@ -177,24 +164,11 @@ func (r *wfmRequest) editText() {
 		htErr(r.w, "Unable to read file", err)
 		return
 	}
-	le := *defLe
-	if bytes.IndexByte(f, '\r') != -1 {
-		le = "CRLF"
-	}
 	header(r.w, r.uDir, r.eSort, ``, r.modern)
 	r.w.Write([]byte(`
 <div class="editor-container">
     <div class="editor-header">
         <div>File Editor: ` + html.EscapeString(r.uFbn) + `</div>
-        <div>
-            <label>Line Endings:</label>
-            <select name="crlf">
-            ` + selOpt(le, []struct{ v, n string }{
-		{"LF", "LF (Unix)"},
-		{"CRLF", "CRLF (Windows)"},
-	}...) + `
-            </select>
-        </div>
     </div>
     <div class="editor-content">
         <pre id="wfmEditor" contenteditable="true">` + html.EscapeString(string(f)) + `</pre>

@@ -153,7 +153,7 @@ func (r *wfmRequest) uploadFile(h *multipart.FileHeader, f multipart.File) {
 	redirect(r.w, wfmPfx+"?dir="+url.PathEscape(r.uDir)+"&sort="+r.eSort+"&hi="+url.PathEscape(h.Filename))
 }
 
-func (r *wfmRequest) saveText(uData, crlf string) {
+func (r *wfmRequest) saveText(uData string) {
 	if !r.rwAccess {
 		htErr(r.w, "permission", fmt.Errorf("read only"))
 		return
@@ -162,9 +162,8 @@ func (r *wfmRequest) saveText(uData, crlf string) {
 		htErr(r.w, "text save", fmt.Errorf("zero lenght data"))
 		return
 	}
-	if crlf == "LF" {
-		uData = strings.ReplaceAll(uData, "\r\n", "\n")
-	}
+	// Always normalize to LF
+	uData = strings.ReplaceAll(uData, "\r\n", "\n")
 	fp := r.uDir + "/" + r.uFbn
 	tmpName := fp + ".tmp"
 	err := afero.WriteFile(r.fs, tmpName, []byte(uData), 0644)

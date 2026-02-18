@@ -97,7 +97,7 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 		wfm.uploadFile(h, f)
 		return
 	case r.FormValue("save") != "":
-		wfm.saveText(r.FormValue("text"), r.FormValue("crlf"))
+		wfm.saveText(r.FormValue("text"))
 		return
 	case r.FormValue("up") != "":
 		up, err := url.JoinPath(wfmPfx, filepath.Dir(wfm.uDir))
