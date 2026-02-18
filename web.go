@@ -62,18 +62,64 @@ func header(w http.ResponseWriter, uDir, sort, extraCSS string, modern bool) {
 	.thov tr:hover { background-color: #FF8000; color: #FFFFFF; }
 	.tbr { border-width: 1px; border-style: solid solid solid solid; border-color: #AAAAAA #555555 #555555 #AAAAAA; }
 	.nb { border-style:none; background-color: #EEEEEE; }
+	.drop-overlay { position:fixed; inset:0; background:rgba(0,114,198,0.15); border:3px dashed #0072c6; z-index:9999; display:none; align-items:center; justify-content:center; pointer-events:none; }
+	body.drag-over .drop-overlay { display:flex; }
+	.drop-overlay span { background:#fff; padding:12px 24px; border-radius:4px; font-weight:bold; color:#0072c6; }
 	` + extraCSS + `
 --></STYLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF">
-<FORM ACTION="` + wfmPfx + `" METHOD="POST" ENCTYPE="multipart/form-data">
+<DIV CLASS="drop-overlay" ID="dropOverlay"><SPAN>Drop file to upload</SPAN></DIV>
+<FORM ACTION="` + wfmPfx + `" METHOD="POST" ENCTYPE="multipart/form-data" ID="wfmForm">
 <INPUT TYPE="hidden" NAME="dir" VALUE="` + eDir + `">
 <INPUT TYPE="hidden" NAME="sort" VALUE="` + sort + `">
 `))
 }
 
 func footer(w http.ResponseWriter) {
-	w.Write([]byte("\n</FORM></BODY></HTML>\n"))
+	w.Write([]byte(`
+<SCRIPT>
+(function(){
+	var form=document.getElementById("wfmForm");
+	if(!form) return;
+	var dirIn=form.querySelector('input[name="dir"]');
+	var sortIn=form.querySelector('input[name="sort"]');
+	if(!dirIn||!sortIn) return;
+	function prevent(e){ e.preventDefault(); e.stopPropagation(); }
+	function onDragOver(e){ prevent(e); if(e.dataTransfer.types.indexOf("Files")>=0) document.body.classList.add("drag-over"); }
+	function onDragLeave(e){ prevent(e); if(!e.relatedTarget||!document.body.contains(e.relatedTarget)) document.body.classList.remove("drag-over"); }
+	function onDrop(e){
+		prevent(e);
+		document.body.classList.remove("drag-over");
+		var files=e.dataTransfer.files;
+		if(!files||!files.length) return;
+		var dir=dirIn.value, sort=sortIn.value||"", action=form.action;
+		var upload=function(i){
+			if(i>=files.length){ if(i>0) location.reload(); return; }
+			var fd=new FormData();
+			fd.append("dir",dir);
+			fd.append("sort",sort);
+			fd.append("upload","1");
+			fd.append("filename",files[i]);
+			fetch(action,{method:"POST",body:fd,redirect:"manual"}).then(function(r){
+				if(r.type==="opaqueredirect"||(r.status>=300&&r.status<400)){
+					if(i+1>=files.length) location.reload();
+					else upload(i+1);
+				}else{
+					upload(i+1);
+				}
+			}).catch(function(){ upload(i+1); });
+		};
+		upload(0);
+	}
+	document.body.addEventListener("dragover",onDragOver);
+	document.body.addEventListener("dragenter",onDragOver);
+	document.body.addEventListener("dragleave",onDragLeave);
+	document.body.addEventListener("drop",onDrop);
+})();
+</SCRIPT>
+</FORM></BODY></HTML>
+`))
 }
 
 func redirect(w http.ResponseWriter, uUrl string) {
