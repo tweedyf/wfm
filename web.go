@@ -64,7 +64,7 @@ func header(w http.ResponseWriter, uDir, sort, extraCSS string, modern bool) {
 	w.Write([]byte(`</head>
 <body>
 <div class="drop-overlay" id="dropOverlay"><span>Drop file to upload</span></div>
-<form action="` + wfmPfx + `" method="POST" enctype="multipart/form-data" id="wfmForm">
+<form action="` + joinPath(wfmPfx, "/") + `" method="POST" enctype="multipart/form-data" id="wfmForm">
 <input type="hidden" name="dir" value="` + eDir + `">
 <input type="hidden" name="sort" value="` + sort + `">
 `))

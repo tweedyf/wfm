@@ -182,14 +182,14 @@ func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[strin
 	// Toolbar
 	w.Write([]byte(`
 <div class="toolbar">
-    <button type="submit" name="up" class="btn">` + i["tup"] + `<span class="btn-text">Up</span></button>
-    <button type="submit" name="home" class="btn">` + i["tho"] + `<span class="btn-text">Home</span></button>
-    <button type="submit" name="mdelp" class="btn btn-danger" ` + disTag[rw] + `>` + i["trm"] + `<span class="btn-text">Delete</span></button>
-    <button type="submit" name="mmovp" class="btn" ` + disTag[rw] + `>` + i["tmv"] + `<span class="btn-text">Move</span></button>
-    <button type="submit" name="mkd" class="btn" ` + disTag[rw] + `>` + i["tdi"] + `<span class="btn-text">New Folder</span></button>
-    <button type="submit" name="mkf" class="btn" ` + disTag[rw] + `>` + i["tfi"] + `<span class="btn-text">New File</span></button>
+    <button type="submit" name="up" value="1" class="btn">` + i["tup"] + `<span class="btn-text">Up</span></button>
+    <button type="submit" name="home" value="1" class="btn">` + i["tho"] + `<span class="btn-text">Home</span></button>
+    <button type="submit" name="mdelp" value="1" class="btn btn-danger" ` + disTag[rw] + `>` + i["trm"] + `<span class="btn-text">Delete</span></button>
+    <button type="submit" name="mmovp" value="1" class="btn" ` + disTag[rw] + `>` + i["tmv"] + `<span class="btn-text">Move</span></button>
+    <button type="submit" name="mkd" value="1" class="btn" ` + disTag[rw] + `>` + i["tdi"] + `<span class="btn-text">New Folder</span></button>
+    <button type="submit" name="mkf" value="1" class="btn" ` + disTag[rw] + `>` + i["tfi"] + `<span class="btn-text">New File</span></button>
     <input type="file" name="filename" class="btn btn-file" accept="*">
-    <button type="submit" name="upload" class="btn btn-primary" ` + disTag[rw] + `>` + i["tul"] + `<span class="btn-text">Upload</span></button>
+    <button type="submit" name="upload" value="1" class="btn btn-primary" ` + disTag[rw] + `>` + i["tul"] + `<span class="btn-text">Upload</span></button>
 </div>
 `))
 
