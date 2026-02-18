@@ -287,8 +287,8 @@ func icons(m bool) map[string]string {
 			"di": "&#x1F4C2; ",
 			"li": " &#x1F517; ",
 
-			"rm": "&#x274C;",
-			"mv": "&#x1F69A;",
+			"rm": "&#128465;",
+			"mv": "&#10145;;",
 			"re": "&#x1F4AC;",
 			"ed": "&#x1F4DD;",
 			"dn": "&#x1F4BE;",
