@@ -177,7 +177,7 @@ a:hover {
 
 .file-item {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 2fr;
   gap: var(--spacing);
   padding: 0.75rem var(--spacing);
   border-bottom: 1px solid var(--border);
@@ -276,6 +276,14 @@ a:hover {
   justify-content: center;
   z-index: 1000;
   padding: var(--spacing);
+}
+
+.upload-replace-modal {
+  display: none;
+}
+
+.upload-replace-modal.visible {
+  display: flex;
 }
 
 .modal {
