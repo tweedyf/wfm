@@ -205,9 +205,6 @@ func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[strin
             <INPUT TYPE="SUBMIT" NAME="mkf" VALUE="` + i["tfi"] + `New File" CLASS="nb" ` + disTag[rw] + `>
         </TD>
         <TD NOWRAP VALIGN="MIDDLE" ALIGN="CENTER">
-            <INPUT TYPE="SUBMIT" NAME="mkb" VALUE="` + i["tln"] + `New Link" CLASS="nb" ` + disTag[rw] + `>
-        </TD>
-        <TD NOWRAP VALIGN="MIDDLE" ALIGN="CENTER">
             <INPUT TYPE="FILE" NAME="filename" CLASS="nb">&nbsp;
             <INPUT TYPE="SUBMIT" NAME="upload" VALUE="` + i["tul"] + `Upload" CLASS="nb" ` + disTag[rw] + `>
         </TD>
@@ -299,7 +296,6 @@ func icons(m bool) map[string]string {
 			"tre": "&#x1F300; ",
 			"trm": "&#x274C; ",
 			"tmv": "&#x1F69A; ",
-			"tln": "&#x1F310; ",
 			"tfi": "&#x1F4D2; ",
 			"tdi": "&#x1F4C2; ",
 			"tul": "&#x1F680; ",
