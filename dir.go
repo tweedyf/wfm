@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html"
 	"log"
@@ -33,6 +34,31 @@ func (r *wfmRequest) listFiles(hi string) {
 
 	header(r.w, r.uDir, r.eSort, "", r.modern)
 	toolbars(r.w, r.uDir, r.userName, sl, i, r.rwAccess)
+	// Emit existing file names for client-side upload-replace confirmation
+	var existingFiles []string
+	for _, f := range d {
+		var ldir bool
+		if f.Mode()&os.ModeSymlink == os.ModeSymlink {
+			ls, err := r.fs.Stat(r.uDir + "/" + f.Name())
+			if err != nil {
+				continue
+			}
+			ldir = ls.IsDir()
+		} else {
+			ldir = f.IsDir()
+		}
+		if ldir {
+			continue
+		}
+		if !*showDot && len(f.Name()) > 0 && f.Name()[0:1] == "." {
+			continue
+		}
+		existingFiles = append(existingFiles, f.Name())
+	}
+	if b, err := json.Marshal(existingFiles); err == nil {
+		r.w.Write([]byte(`<script>window.wfmExistingFiles=` + string(b) + `;</script>
+`))
+	}
 	qeDir := strings.ReplaceAll(url.PathEscape(r.uDir), `%2F`, `/`)
 
 	z := 0
@@ -159,6 +185,19 @@ func (r *wfmRequest) listFiles(hi string) {
 	r.w.Write([]byte(`
     </ul>
     <div class="file-footer">` + fmt.Sprint(totItems) + ` items, ` + humanize.Bytes(total) + ` total</div>
+</div>
+<div class="modal-overlay upload-replace-modal" id="uploadReplaceModal" aria-hidden="true">
+    <div class="modal">
+        <div class="modal-header">Replace existing file(s)?</div>
+        <div class="modal-body">
+            <p id="uploadReplaceMessage">The following file(s) already exist and will be overwritten:</p>
+            <ul id="uploadReplaceList"></ul>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="uploadReplaceConfirm" class="btn btn-primary">Replace</button>
+            <button type="button" id="uploadReplaceCancel" class="btn">Cancel</button>
+        </div>
+    </div>
 </div>
 `))
 	footer(r.w)

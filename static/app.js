@@ -3,6 +3,71 @@
 (function() {
   'use strict';
 
+  var uploadReplaceConfirmCallback = null;
+
+  function showUploadReplaceModal(fileNames, onConfirm) {
+    var modal = document.getElementById('uploadReplaceModal');
+    var listEl = document.getElementById('uploadReplaceList');
+    var confirmBtn = document.getElementById('uploadReplaceConfirm');
+    var cancelBtn = document.getElementById('uploadReplaceCancel');
+    if (!modal || !listEl) return;
+    listEl.innerHTML = '';
+    fileNames.forEach(function(name) {
+      var li = document.createElement('li');
+      li.textContent = name;
+      listEl.appendChild(li);
+    });
+    uploadReplaceConfirmCallback = onConfirm;
+    modal.classList.add('visible');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  function hideUploadReplaceModal() {
+    var modal = document.getElementById('uploadReplaceModal');
+    if (modal) {
+      modal.classList.remove('visible');
+      modal.setAttribute('aria-hidden', 'true');
+      uploadReplaceConfirmCallback = null;
+    }
+  }
+
+  function initUploadReplaceModal() {
+    var modal = document.getElementById('uploadReplaceModal');
+    var confirmBtn = document.getElementById('uploadReplaceConfirm');
+    var cancelBtn = document.getElementById('uploadReplaceCancel');
+    if (!modal || !confirmBtn || !cancelBtn) return;
+
+    confirmBtn.addEventListener('click', function() {
+      if (uploadReplaceConfirmCallback) uploadReplaceConfirmCallback();
+      hideUploadReplaceModal();
+    });
+    cancelBtn.addEventListener('click', hideUploadReplaceModal);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideUploadReplaceModal();
+    });
+
+    var form = document.getElementById('wfmForm');
+    var fileInput = form && form.querySelector('input[name="filename"]');
+    if (form && fileInput) {
+      form.addEventListener('submit', function(e) {
+        var sub = e.submitter;
+        if (!sub || sub.name !== 'upload' || sub.value !== '1') return;
+        var files = fileInput.files;
+        if (!files || files.length === 0) return;
+        var existing = window.wfmExistingFiles || [];
+        var wouldReplace = [];
+        for (var i = 0; i < files.length; i++) {
+          if (existing.indexOf(files[i].name) !== -1) wouldReplace.push(files[i].name);
+        }
+        if (wouldReplace.length === 0) return;
+        e.preventDefault();
+        showUploadReplaceModal(wouldReplace, function() {
+          form.submit();
+        });
+      });
+    }
+  }
+
   // Initialize drag and drop
   function initDragDrop() {
     const form = document.getElementById('wfmForm');
@@ -31,16 +96,10 @@
       }
     }
 
-    function onDrop(e) {
-      prevent(e);
-      document.body.classList.remove('drag-over');
-      const files = e.dataTransfer.files;
-      if (!files || !files.length) return;
-
+    function doDropUpload(files) {
       const dir = dirInput.value;
       const sort = sortInput.value || '';
       const action = form.action;
-
       function upload(i) {
         if (i >= files.length) {
           if (i > 0) location.reload();
@@ -67,6 +126,26 @@
         });
       }
       upload(0);
+    }
+
+    function onDrop(e) {
+      prevent(e);
+      document.body.classList.remove('drag-over');
+      const files = e.dataTransfer.files;
+      if (!files || !files.length) return;
+
+      const existing = window.wfmExistingFiles || [];
+      const wouldReplace = [];
+      for (let i = 0; i < files.length; i++) {
+        if (existing.indexOf(files[i].name) !== -1) wouldReplace.push(files[i].name);
+      }
+      if (wouldReplace.length > 0) {
+        showUploadReplaceModal(wouldReplace, function() {
+          doDropUpload(files);
+        });
+        return;
+      }
+      doDropUpload(files);
     }
 
     document.addEventListener('dragover', onDragOver);
@@ -108,10 +187,12 @@
   // Initialize on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
+      initUploadReplaceModal();
       initDragDrop();
       initCheckboxes();
     });
   } else {
+    initUploadReplaceModal();
     initDragDrop();
     initCheckboxes();
   }
