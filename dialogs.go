@@ -14,10 +14,10 @@ import (
 func selOpt(s string, f ...struct{ v, n string }) string {
 	var o []string
 	var m = make(map[string]string)
-	m[s] = "SELECTED"
-	m[""] = "DISABLED"
+	m[s] = "selected"
+	m[""] = "disabled"
 	for _, i := range f {
-		o = append(o, fmt.Sprintf("<OPTION VALUE=\"%v\" %v>%v</OPTION>", i.v, m[i.v], i.n))
+		o = append(o, fmt.Sprintf("<option value=\"%v\" %v>%v</option>", html.EscapeString(i.v), m[i.v], html.EscapeString(i.n)))
 	}
 	return strings.Join(o, "\n")
 }
@@ -25,94 +25,138 @@ func selOpt(s string, f ...struct{ v, n string }) string {
 func (r *wfmRequest) prompt(action string, mul []string) {
 	header(r.w, r.uDir, r.eSort, "", r.modern)
 
+	actionTitle := action
+	switch action {
+	case "mkdir":
+		actionTitle = "Create Directory"
+	case "mkfile":
+		actionTitle = "Create File"
+	case "mkurl":
+		actionTitle = "Create URL File"
+	case "rename":
+		actionTitle = "Rename"
+	case "move":
+		actionTitle = "Move"
+	case "delete":
+		actionTitle = "Delete"
+	case "multi_delete":
+		actionTitle = "Delete Multiple Files"
+	case "multi_move":
+		actionTitle = "Move Multiple Files"
+	}
+
 	r.w.Write([]byte(`
-    <TABLE WIDTH="100%" HEIGHT="90%" BORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD VALIGN="MIDDLE" ALIGN="CENTER">
-    <BR>&nbsp;<BR><P>
-    <TABLE WIDTH="400" BGCOLOR="#F0F0F0" BORDER="0" CELLSPACING="0" CELLPADDING="1" CLASS="tbr">
-      <TR><TD COLSPAN="2" BGCOLOR="#004080"><FONT COLOR="#FFFFFF">&nbsp; ` + action + `</FONT></TD></TR>
-      <TR><TD WIDTH="30">&nbsp;</TD><TD>
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">` + html.EscapeString(actionTitle) + `</div>
+        <div class="modal-body">
     `))
 
 	switch action {
 	case "mkdir":
 		r.w.Write([]byte(`
-        &nbsp;<BR>Enter name for the new directory:<P>
-        <INPUT TYPE="TEXT" NAME="file" SIZE="40" VALUE="">
+            <div class="form-group">
+                <label>Enter name for the new directory:</label>
+                <input type="text" name="file" value="" required autofocus>
+            </div>
         `))
 	case "mkfile":
 		r.w.Write([]byte(`
-        &nbsp;<BR>Enter name for the new file:<P>
-        <INPUT TYPE="TEXT" NAME="file" SIZE="40" VALUE="">
+            <div class="form-group">
+                <label>Enter name for the new file:</label>
+                <input type="text" name="file" value="" required autofocus>
+            </div>
         `))
 	case "mkurl":
 		r.w.Write([]byte(`
-        &nbsp;<BR>Enter name for the new url file:<P>
-        <INPUT TYPE="TEXT" NAME="file" SIZE="40" VALUE="">
-        &nbsp;<BR>Destination URL:<P>
-        <INPUT TYPE="TEXT" NAME="url" SIZE="40" VALUE="">
+            <div class="form-group">
+                <label>Enter name for the new URL file:</label>
+                <input type="text" name="file" value="" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>Destination URL:</label>
+                <input type="text" name="url" value="" required>
+            </div>
         `))
 	case "rename":
 		eBn := html.EscapeString(r.uFbn)
 		r.w.Write([]byte(`
-        &nbsp;<BR>Enter new name for the file <B>` + eBn + `</B>:<P>
-        <INPUT TYPE="TEXT" NAME="dst" SIZE="40" VALUE="` + eBn + `">
-        <INPUT TYPE="HIDDEN" NAME="file" VALUE="` + eBn + `">
+            <div class="form-group">
+                <label>Enter new name for the file <strong>` + eBn + `</strong>:</label>
+                <input type="text" name="dst" value="` + eBn + `" required autofocus>
+                <input type="hidden" name="file" value="` + eBn + `">
+            </div>
         `))
 	case "move":
 		eBn := html.EscapeString(r.uFbn)
 		r.w.Write([]byte(`
-		&nbsp;<BR>Select destination folder for <B>` + eBn + `</B>:<P>
-		<SELECT NAME="dst">
-		` + upDnDir(r.uDir, "", r.fs) + `</SELECT>
-		<INPUT TYPE="HIDDEN" NAME="file" VALUE="` + eBn + `">
-		`))
+            <div class="form-group">
+                <label>Select destination folder for <strong>` + eBn + `</strong>:</label>
+                <select name="dst" required autofocus>
+                ` + upDnDir(r.uDir, "", r.fs) + `
+                </select>
+                <input type="hidden" name="file" value="` + eBn + `">
+            </div>
+        `))
 	case "delete":
 		var a string
 		fi, _ := r.fs.Stat(r.uDir + "/" + r.uFbn)
-		if fi.IsDir() {
-			a = "directory - recursively"
-		} else {
-			a = "file, size " + humanize.Bytes(uint64(fi.Size()))
+		if fi != nil {
+			if fi.IsDir() {
+				a = "directory - recursively"
+			} else {
+				a = "file, size " + humanize.Bytes(uint64(fi.Size()))
+			}
 		}
 		eBn := html.EscapeString(r.uFbn)
 		r.w.Write([]byte(`
-        &nbsp;<BR>Are you sure you want to delete:<BR><B>` + eBn + `</B>
-        (` + a + `)<P>
-        <INPUT TYPE="HIDDEN" NAME="file" VALUE="` + eBn + `">
+            <div class="form-group">
+                <p>Are you sure you want to delete:</p>
+                <p><strong>` + eBn + `</strong> (` + a + `)</p>
+                <input type="hidden" name="file" value="` + eBn + `">
+            </div>
         `))
 	case "multi_delete":
-		fmt.Fprintf(r.w, "&nbsp;<BR>Are you sure you want to delete from <B>%v</B>:<P><UL>\n", html.EscapeString(r.uDir))
+		fmt.Fprintf(r.w, `<div class="form-group">
+            <p>Are you sure you want to delete from <strong>%v</strong>:</p>
+            <ul style="list-style: square; margin-left: 1.5rem; margin-top: 0.5rem;">
+        `, html.EscapeString(r.uDir))
 		for _, f := range mul {
 			fE := html.EscapeString(f)
-			fmt.Fprintf(r.w, "<INPUT TYPE=\"HIDDEN\" NAME=\"mulf\" VALUE=\"%s\">\n"+
-				"<LI TYPE=\"square\">%v</LI>\n", fE, fE)
+			fmt.Fprintf(r.w, `<input type="hidden" name="mulf" value="%s">
+                <li>%v</li>
+        `, fE, fE)
 		}
-		fmt.Fprintln(r.w, "</UL><P>")
+		fmt.Fprintln(r.w, `</ul></div>`)
 	case "multi_move":
-		fmt.Fprintf(r.w, "&nbsp;<BR>Move from: <B>%v</B><P>\n"+
-			"To: <SELECT NAME=\"dst\">%v</SELECT><P>\n<UL>Items:<P>\n",
+		fmt.Fprintf(r.w, `<div class="form-group">
+            <p>Move from: <strong>%v</strong></p>
+            <label>To:</label>
+            <select name="dst" required autofocus>%v</select>
+            <p style="margin-top: 1rem;">Items:</p>
+            <ul style="list-style: square; margin-left: 1.5rem; margin-top: 0.5rem;">
+        `,
 			html.EscapeString(r.uDir),
 			upDnDir(r.uDir, r.uFbn, r.fs),
 		)
 		for _, f := range mul {
 			fE := html.EscapeString(f)
-			fmt.Fprintf(r.w, "<INPUT TYPE=\"HIDDEN\" NAME=\"mulf\" VALUE=\"%s\">\n"+
-				"<LI TYPE=\"square\">%v</LI>\n", fE, fE)
+			fmt.Fprintf(r.w, `<input type="hidden" name="mulf" value="%s">
+                <li>%v</li>
+        `, fE, fE)
 		}
-		fmt.Fprintln(r.w, "</UL><P>")
+		fmt.Fprintln(r.w, `</ul></div>`)
 	}
 
 	r.w.Write([]byte(`
-    </TD></TR>
-    <TR><TD COLSPAN="2">
-    <P><CENTER>
-    <INPUT TYPE="SUBMIT" VALUE=" OK " NAME="OK" ` + disTag[r.rwAccess] + `>&nbsp;
-    <INPUT TYPE="SUBMIT" VALUE=" Cancel " NAME="cancel">
-    <INPUT TYPE="HIDDEN" NAME="fn" VALUE="` + action + `">
-    </CENTER>
-    </TD></TR><TR><TD COLSPAN="2">&nbsp;</TD></TR>
-    </TABLE>
-    </TD></TR></TABLE>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" name="OK" class="btn btn-primary" ` + disTag[r.rwAccess] + `>OK</button>
+            <button type="submit" name="cancel" class="btn">Cancel</button>
+            <input type="hidden" name="fn" value="` + action + `">
+        </div>
+    </div>
+</div>
     `))
 
 	footer(r.w)
@@ -137,44 +181,32 @@ func (r *wfmRequest) editText() {
 	if bytes.IndexByte(f, '\r') != -1 {
 		le = "CRLF"
 	}
-	header(r.w, r.uDir, r.eSort, `html, body { box-sizing: border-box; height:100%; }
-#wfmEditor { box-sizing:border-box; width:100%; height:90vh; padding:8px; margin:0; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap; word-wrap:break-word; font-family:monospace; border:1px solid #CCCCCC; background-color:#FFFFFF; }`, r.modern)
+	header(r.w, r.uDir, r.eSort, ``, r.modern)
 	r.w.Write([]byte(`
-    <TABLE BGCOLOR="#EEEEEE" BORDER="0" CELLSPACING="0" CELLPADDING="5" STYLE="width: 100%; height: 100%;">
-    <TR STYLE="height:1%;">
-    <TD ALIGN="LEFT" VALIGN="MIDDLE" BGCOLOR="#CCCCCC">File Editor: ` + html.EscapeString(r.uFbn) + `</TD>
-    <TD  BGCOLOR="#CCCCCC" ALIGN="RIGHT">
-	Line Endings:
-	<SELECT NAME="crlf">
-	` + selOpt(le, []struct{ v, n string }{
+<div class="editor-container">
+    <div class="editor-header">
+        <div>File Editor: ` + html.EscapeString(r.uFbn) + `</div>
+        <div>
+            <label>Line Endings:</label>
+            <select name="crlf">
+            ` + selOpt(le, []struct{ v, n string }{
 		{"LF", "LF (Unix)"},
 		{"CRLF", "CRLF (Windows)"},
 	}...) + `
-	</SELECT>
-	</TD>
-    </TR>
-    <TR>
-    <TD COLSPAN="2" ALIGN="LEFT" VALIGN="TOP">
-    <PRE ID="wfmEditor" CONTENTEDITABLE="true">` + html.EscapeString(string(f)) + `</PRE>
-    <TEXTAREA NAME="text" ID="wfmEditorInput" STYLE="display:none;">` + html.EscapeString(string(f)) + `</TEXTAREA>
-    </TD></TR><TR STYLE="height:1%;"><TD>&nbsp;</TD><TD ALIGN="RIGHT" STYLE="padding-top:8px;">
-	<INPUT TYPE="SUBMIT" NAME="save" VALUE="Save" ` + disTag[r.rwAccess] + `>&nbsp;
-	<INPUT TYPE="SUBMIT" NAME="cancel" VALUE="Cancel">
-    <INPUT TYPE="HIDDEN" NAME="dir" VALUE="` + html.EscapeString(r.uDir) + `">
-    <INPUT TYPE="HIDDEN" NAME="file" VALUE="` + html.EscapeString(r.uFbn) + `">
-    </TD></TR></TABLE>
-    <SCRIPT TYPE="text/javascript">
-    (function(){
-      var form=document.getElementById("wfmForm");
-      var pre=document.getElementById("wfmEditor");
-      var hidden=document.getElementById("wfmEditorInput");
-      if(!form||!pre||!hidden) return;
-      form.addEventListener("submit", function(){
-        if(pre.innerText!==undefined){ hidden.value=pre.innerText; }
-        else if(pre.textContent!==undefined){ hidden.value=pre.textContent; }
-      });
-    })();
-    </SCRIPT>
+            </select>
+        </div>
+    </div>
+    <div class="editor-content">
+        <pre id="wfmEditor" contenteditable="true">` + html.EscapeString(string(f)) + `</pre>
+        <textarea name="text" id="wfmEditorInput" style="display:none;">` + html.EscapeString(string(f)) + `</textarea>
+    </div>
+    <div class="editor-header" style="justify-content: flex-end; gap: 0.5rem;">
+        <button type="submit" name="save" class="btn btn-primary" ` + disTag[r.rwAccess] + `>Save</button>
+        <button type="submit" name="cancel" class="btn">Cancel</button>
+        <input type="hidden" name="dir" value="` + html.EscapeString(r.uDir) + `">
+        <input type="hidden" name="file" value="` + html.EscapeString(r.uFbn) + `">
+    </div>
+</div>
     `))
 	footer(r.w)
 }
@@ -183,19 +215,23 @@ func (r *wfmRequest) about(ua string) {
 	header(r.w, r.uDir, r.eSort, "", r.modern)
 
 	r.w.Write([]byte(`
-    <TABLE WIDTH="100%" HEIGHT="90%" BORDER="0" CELLSPACING="0" CELLPADDING="0"><TR><TD VALIGN="MIDDLE" ALIGN="CENTER">
-    <BR>&nbsp;<BR><P>
-    <TABLE WIDTH="400" BGCOLOR="#F0F0F0" BORDER="0" CELLSPACING="0" CELLPADDING="1" CLASS="tbr">
-      <TR><TD COLSPAN="2" BGCOLOR="#004080"><FONT COLOR="#FFFFFF">&nbsp; Web File Manager</FONT></TD></TR>
-      <TR><TD WIDTH="30">&nbsp;</TD><TD ALIGN="LEFT"><BR>
-	  WFM Version v` + vers + `<BR>
-	  <A HREF="https://github.com/tenox7/wfm/">https://github.com/tenox7/wfm/</A><BR>
-	  Written by Antoni Sawicki Et Al.<BR>
-	  Copyright &copy; 1994-2025 by Antoni Sawicki<BR>
-	`))
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">Web File Manager</div>
+        <div class="modal-body">
+            <p><strong>WFM Version v` + vers + `</strong></p>
+            <p><a href="https://github.com/tenox7/wfm/">https://github.com/tenox7/wfm/</a></p>
+            <p>Written by Antoni Sawicki Et Al.</p>
+            <p>Copyright &copy; 1994-2025 by Antoni Sawicki</p>
+    `))
 
 	if *aboutRnt {
-		fmt.Fprintf(r.w, "Build: %v %v-%v<BR>Agent: %v<P>",
+		fmt.Fprintf(r.w, `
+            <p style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                Build: %v %v-%v<br>
+                Agent: %v
+            </p>
+        `,
 			runtime.Version(),
 			runtime.GOARCH,
 			runtime.GOOS,
@@ -203,14 +239,12 @@ func (r *wfmRequest) about(ua string) {
 	}
 
 	r.w.Write([]byte(`
-      </TD></TR>
-    <TR><TD COLSPAN="2">
-    <P><CENTER>
-    <INPUT TYPE="SUBMIT" VALUE=" OK " NAME="OK">&nbsp;
-    </CENTER>
-    </TD></TR><TR><TD COLSPAN="2">&nbsp;</TD></TR>
-    </TABLE>
-    </TD></TR></TABLE>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" name="OK" class="btn btn-primary">OK</button>
+        </div>
+    </div>
+</div>
     `))
 
 	footer(r.w)

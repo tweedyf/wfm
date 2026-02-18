@@ -110,17 +110,6 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 		}
 		redirect(w, up)
 		return
-	case r.FormValue("refresh") != "":
-		re, err := url.JoinPath(wfmPfx, wfm.uDir)
-		if err != nil {
-			htErr(w, "up path build", err)
-			return
-		}
-		if wfm.eSort != "" {
-			re += "?sort=" + wfm.eSort
-		}
-		redirect(w, re)
-		return
 	case r.FormValue("home") != "":
 		wfm.uDir = "/"
 		wfm.listFiles(filepath.Base(r.FormValue("hi")))

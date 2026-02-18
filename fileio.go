@@ -1,10 +1,10 @@
 package main
 
 import (
-	_ "embed"
-
+	"embed"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -23,6 +23,9 @@ var favIcn []byte
 
 //go:embed robots.txt
 var robotsTxt []byte
+
+//go:embed static
+var staticFS embed.FS
 
 var (
 	rlBu *ratelimit.Bucket
@@ -340,4 +343,15 @@ func (r *wfmRequest) dispOrDir(hi string) {
 	r.uFbn = filepath.Base(r.uDir)
 	r.uDir = filepath.Dir(r.uDir)
 	r.dispFile()
+}
+
+func serveStatic(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", *cacheCtl)
+	// Request path was already stripped by StripPrefix (e.g. "style.css", "fontawesome/css/all.min.css")
+	subFS, err := fs.Sub(staticFS, "static")
+	if err != nil {
+		http.Error(w, "static files unavailable", http.StatusInternalServerError)
+		return
+	}
+	http.FileServer(http.FS(subFS)).ServeHTTP(w, r)
 }

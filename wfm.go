@@ -224,6 +224,11 @@ func main() {
 		wfmFs = afero.NewBasePathFs(wfmFs, pfx[0])
 	}
 	wfmPfx = pfx[1]
+	
+	// Serve static files (embedded fallback)
+	staticPrefix := strings.TrimSuffix(wfmPfx, "/") + "/static/"
+	mux.PathPrefix(staticPrefix).Handler(http.StripPrefix(staticPrefix, http.HandlerFunc(serveStatic)))
+	
 	mux.PathPrefix(wfmPfx).HandlerFunc(wfmMain)
 	if *f2bDump != "" {
 		mux.HandleFunc(*f2bDump, dumpf2b)
