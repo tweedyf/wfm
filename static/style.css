@@ -132,16 +132,6 @@ a:hover {
   background: var(--primary-dark);
 }
 
-.btn-danger {
-  background: var(--danger);
-  color: white;
-  border-color: var(--danger);
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: #c82333;
-}
-
 /* File List */
 .file-list-container {
   width: 70%;
