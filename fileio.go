@@ -121,6 +121,25 @@ func streamFile(w http.ResponseWriter, uFilePath string, wfs afero.Fs) {
 	}
 }
 
+// allowedUploadExt returns true if the file extension is allowed for upload (text, PDF, or image).
+func allowedUploadExt(filename string) bool {
+	ext := strings.ToLower(filepath.Ext(filename))
+	if ext == "" {
+		return false
+	}
+	ext = ext[1:] // drop leading dot
+	allowed := map[string]bool{
+		"txt": true, "log": true, "csv": true, "md": true, "markdown": true, "mdown": true,
+		"html": true, "htm": true, "xml": true, "json": true, "js": true, "css": true,
+		"cfg": true, "conf": true, "ini": true, "yaml": true, "yml": true, "rst": true,
+		"tex": true, "text": true,
+		"pdf": true,
+		"png": true, "jpg": true, "jpeg": true, "gif": true, "webp": true, "bmp": true,
+		"ico": true, "tif": true, "tiff": true, "heif": true, "heic": true, "svg": true,
+	}
+	return allowed[ext]
+}
+
 func (r *wfmRequest) uploadFile(h *multipart.FileHeader, f multipart.File) {
 	if !r.rwAccess {
 		htErr(r.w, "permission", fmt.Errorf("read only"))
@@ -129,6 +148,10 @@ func (r *wfmRequest) uploadFile(h *multipart.FileHeader, f multipart.File) {
 	defer f.Close()
 
 	h.Filename = strings.ReplaceAll(h.Filename, "\\", string(os.PathSeparator))
+	if !allowedUploadExt(h.Filename) {
+		htErr(r.w, "upload", fmt.Errorf("only text, PDF, and image files are allowed"))
+		return
+	}
 	fi, err := r.fs.OpenFile(filepath.Join(r.uDir, "/", filepath.Base(h.Filename)), os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		htErr(r.w, "unable to write file", err)

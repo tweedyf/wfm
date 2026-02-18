@@ -227,7 +227,7 @@ func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[strin
     <button type="submit" name="mmovp" value="1" class="btn" ` + disTag[rw] + `>` + i["tmv"] + `<span class="btn-text">Move</span></button>
     <button type="submit" name="mkd" value="1" class="btn" ` + disTag[rw] + `>` + i["tdi"] + `<span class="btn-text">New Folder</span></button>
     <button type="submit" name="mkf" value="1" class="btn" ` + disTag[rw] + `>` + i["tfi"] + `<span class="btn-text">New File</span></button>
-    <input type="file" name="filename" class="btn btn-file" accept="*">
+    <input type="file" name="filename" class="btn btn-file" accept="text/*,application/pdf,image/*">
     <button type="submit" name="upload" value="1" class="btn btn-primary" ` + disTag[rw] + `>` + i["tul"] + `<span class="btn-text">Upload</span></button>
 </div>
 `))
