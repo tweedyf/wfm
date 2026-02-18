@@ -115,9 +115,15 @@ func (r *wfmRequest) listFiles(hi string) {
 		z++
 		qeFile := url.PathEscape(f.Name())
 		heFile := html.EscapeString(f.Name())
-		nUrl, err := url.JoinPath(wfmPfx, qeDir, qeFile)
+		fileUrl, err := url.JoinPath(wfmPfx, qeDir, qeFile)
 		if err != nil {
 			log.Printf("Unable to parse url: %v", err)
+		}
+		if isEditableTextFile(f.Name()) {
+			fileUrl = wfmPfx + `?fn=edit&amp;dir=` + qeDir + `&amp;file=` + qeFile
+			if r.eSort != "" {
+				fileUrl += `&amp;sort=` + r.eSort
+			}
 		}
 		highlight := ""
 		if f.Name() == hi {
@@ -127,7 +133,7 @@ func (r *wfmRequest) listFiles(hi string) {
         <li class="file-item` + highlight + `">
             <div class="file-name">
                 <input type="checkbox" name="mulf" value="` + heFile + `" id="cb-file-` + heFile + `">
-                <a href="` + nUrl + `">` + fileIcon(qeFile, r.modern) + ` ` + heFile + `</a>` + li + `
+                <a href="` + fileUrl + `">` + fileIcon(qeFile, r.modern) + ` ` + heFile + `</a>` + li + `
             </div>
             <div class="file-size">` + humanize.Bytes(uint64(f.Size())) + `</div>
             <div class="file-actions">
@@ -296,6 +302,20 @@ func icons(m bool) map[string]string {
 		"rw": "[rw]",
 		"ro": "[ro]",
 	}
+}
+
+// isEditableTextFile returns true for file names with extensions that link to the edit page.
+func isEditableTextFile(name string) bool {
+	s := strings.Split(name, ".")
+	if len(s) < 2 {
+		return false
+	}
+	ext := strings.ToLower(s[len(s)-1])
+	switch ext {
+	case "txt", "log", "csv", "md", "mhtml", "html", "htm", "cfg", "conf", "ini", "json", "xml":
+		return true
+	}
+	return false
 }
 
 func fileIcon(f string, m bool) string {
