@@ -137,7 +137,8 @@ func (r *wfmRequest) editText() {
 	if bytes.IndexByte(f, '\r') != -1 {
 		le = "CRLF"
 	}
-	header(r.w, r.uDir, r.eSort, `html, body, table, textarea, form { box-sizing: border-box; height:98%; }`, r.modern)
+	header(r.w, r.uDir, r.eSort, `html, body { box-sizing: border-box; height:100%; }
+#wfmEditor { box-sizing:border-box; width:100%; height:90vh; padding:8px; margin:0; overflow:auto; white-space:pre; font-family:monospace; border:1px solid #CCCCCC; background-color:#FFFFFF; }`, r.modern)
 	r.w.Write([]byte(`
     <TABLE BGCOLOR="#EEEEEE" BORDER="0" CELLSPACING="0" CELLPADDING="5" STYLE="width: 100%; height: 100%;">
     <TR STYLE="height:1%;">
@@ -152,15 +153,28 @@ func (r *wfmRequest) editText() {
 	</SELECT>
 	</TD>
     </TR>
-    <TR STYLE="height:98%;">
-    <TD COLSPAN="2" ALIGN="CENTER" VALIGN="MIDDLE" STYLE="height:100%;">
-    <TEXTAREA NAME="text" SPELLCHECK="false" COLS="80" ROWS="24" STYLE="width: 99%; height: 99%;">` + html.EscapeString(string(f)) + `</TEXTAREA><P>
-    </TD></TR><TR STYLE="height:1%;"><TD>&nbsp;</TD><TD ALIGN="RIGHT">
+    <TR>
+    <TD COLSPAN="2" ALIGN="LEFT" VALIGN="TOP">
+    <PRE ID="wfmEditor" CONTENTEDITABLE="true">` + html.EscapeString(string(f)) + `</PRE>
+    <TEXTAREA NAME="text" ID="wfmEditorInput" STYLE="display:none;">` + html.EscapeString(string(f)) + `</TEXTAREA>
+    </TD></TR><TR STYLE="height:1%;"><TD>&nbsp;</TD><TD ALIGN="RIGHT" STYLE="padding-top:8px;">
 	<INPUT TYPE="SUBMIT" NAME="save" VALUE="Save" ` + disTag[r.rwAccess] + `>&nbsp;
 	<INPUT TYPE="SUBMIT" NAME="cancel" VALUE="Cancel">
     <INPUT TYPE="HIDDEN" NAME="dir" VALUE="` + html.EscapeString(r.uDir) + `">
     <INPUT TYPE="HIDDEN" NAME="file" VALUE="` + html.EscapeString(r.uFbn) + `">
     </TD></TR></TABLE>
+    <SCRIPT TYPE="text/javascript">
+    (function(){
+      var form=document.getElementById("wfmForm");
+      var pre=document.getElementById("wfmEditor");
+      var hidden=document.getElementById("wfmEditorInput");
+      if(!form||!pre||!hidden) return;
+      form.addEventListener("submit", function(){
+        if(pre.innerText!==undefined){ hidden.value=pre.innerText; }
+        else if(pre.textContent!==undefined){ hidden.value=pre.textContent; }
+      });
+    })();
+    </SCRIPT>
     `))
 	footer(r.w)
 }
