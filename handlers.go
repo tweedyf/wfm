@@ -40,7 +40,7 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 
 	fs := wfmFs
 	if uName != "" && uName != "n/a" && uName != "admin" {
-		fs = afero.NewBasePathFs(fs, uName)
+		fs = afero.NewBasePathFs(fs, "/"+uName)
 	}
 
 	wfm := &wfmRequest{
