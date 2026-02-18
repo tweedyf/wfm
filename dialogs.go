@@ -138,7 +138,7 @@ func (r *wfmRequest) editText() {
 		le = "CRLF"
 	}
 	header(r.w, r.uDir, r.eSort, `html, body { box-sizing: border-box; height:100%; }
-#wfmEditor { box-sizing:border-box; width:100%; height:90vh; padding:8px; margin:0; overflow:auto; white-space:pre; font-family:monospace; border:1px solid #CCCCCC; background-color:#FFFFFF; }`, r.modern)
+#wfmEditor { box-sizing:border-box; width:100%; height:90vh; padding:8px; margin:0; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap; word-wrap:break-word; font-family:monospace; border:1px solid #CCCCCC; background-color:#FFFFFF; }`, r.modern)
 	r.w.Write([]byte(`
     <TABLE BGCOLOR="#EEEEEE" BORDER="0" CELLSPACING="0" CELLPADDING="5" STYLE="width: 100%; height: 100%;">
     <TR STYLE="height:1%;">
