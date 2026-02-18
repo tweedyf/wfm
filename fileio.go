@@ -149,7 +149,9 @@ func (r *wfmRequest) uploadFile(h *multipart.FileHeader, f multipart.File) {
 
 	h.Filename = strings.ReplaceAll(h.Filename, "\\", string(os.PathSeparator))
 	if !allowedUploadExt(h.Filename) {
-		htErr(r.w, "upload", fmt.Errorf("only text, PDF, and image files are allowed"))
+		log.Printf("upload rejected: disallowed type: %s", h.Filename)
+		r.w.Header().Set("X-WFM-Upload-Rejected", "1")
+		writeUploadRejectedPage(r.w, r.uDir, r.eSort, filepath.Base(h.Filename), r.modern)
 		return
 	}
 	fi, err := r.fs.OpenFile(filepath.Join(r.uDir, "/", filepath.Base(h.Filename)), os.O_RDWR|os.O_CREATE, 0644)

@@ -418,6 +418,30 @@ body.drag-over .drop-overlay {
   font-size: 1.25rem;
 }
 
+/* Upload rejected error page */
+.upload-error {
+  max-width: 32rem;
+  margin: var(--spacing) auto;
+  padding: var(--spacing);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-alt);
+}
+
+.upload-error-title {
+  font-weight: 600;
+  color: var(--danger, #c00);
+  margin-top: 0;
+}
+
+.upload-error p {
+  margin: 0.5rem 0;
+}
+
+.upload-error p:last-of-type {
+  margin-top: 1rem;
+}
+
 /* Sort indicators */
 .sort-indicator {
   display: inline-block;

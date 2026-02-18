@@ -115,6 +115,14 @@
           body: fd,
           redirect: 'manual'
         }).then(function(r) {
+          if (r.headers.get('X-WFM-Upload-Rejected') === '1') {
+            r.text().then(function(html) {
+              document.open();
+              document.write(html);
+              document.close();
+            });
+            return;
+          }
           if (r.type === 'opaqueredirect' || (r.status >= 300 && r.status < 400)) {
             if (i + 1 >= files.length) location.reload();
             else upload(i + 1);

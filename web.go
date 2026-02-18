@@ -5,6 +5,7 @@ import (
 	"html"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -77,6 +78,24 @@ func footer(w http.ResponseWriter) {
 </body>
 </html>
 `))
+}
+
+// writeUploadRejectedPage renders an HTML error page when an upload is rejected (e.g. disallowed file type).
+func writeUploadRejectedPage(w http.ResponseWriter, uDir, eSort, filename string, modern bool) {
+	header(w, uDir, eSort, "", modern)
+	backURL := joinPath(wfmPfx, "/") + "?dir=" + url.PathEscape(uDir)
+	if eSort != "" {
+		backURL += "&sort=" + eSort
+	}
+	w.Write([]byte(`
+<div class="upload-error">
+    <p class="upload-error-title">Upload rejected</p>
+    <p>The file <strong>` + html.EscapeString(filename) + `</strong> was not uploaded.</p>
+    <p>Only text, PDF, and image files are allowed.</p>
+    <p><a href="` + html.EscapeString(backURL) + `" class="btn btn-primary">Back to directory</a></p>
+</div>
+`))
+	footer(w)
 }
 
 func redirect(w http.ResponseWriter, uUrl string) {
