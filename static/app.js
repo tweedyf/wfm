@@ -75,23 +75,6 @@
     document.addEventListener('drop', onDrop);
   }
 
-  // Initialize editor sync
-  function initEditor() {
-    const form = document.getElementById('wfmForm');
-    const pre = document.getElementById('wfmEditor');
-    const hidden = document.getElementById('wfmEditorInput');
-    
-    if (!form || !pre || !hidden) return;
-
-    form.addEventListener('submit', function() {
-      if (pre.innerText !== undefined) {
-        hidden.value = pre.innerText;
-      } else if (pre.textContent !== undefined) {
-        hidden.value = pre.textContent;
-      }
-    });
-  }
-
   // Initialize checkboxes for multi-select
   function initCheckboxes() {
     const checkboxes = document.querySelectorAll('input[name="mulf"]');
@@ -126,12 +109,10 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       initDragDrop();
-      initEditor();
       initCheckboxes();
     });
   } else {
     initDragDrop();
-    initEditor();
     initCheckboxes();
   }
 })();

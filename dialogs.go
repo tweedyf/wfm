@@ -138,8 +138,8 @@ func (r *wfmRequest) prompt(action string, mul []string) {
 	r.w.Write([]byte(`
         </div>
         <div class="modal-footer">
-            <button type="submit" name="OK" class="btn btn-primary" ` + disTag[r.rwAccess] + `>OK</button>
-            <button type="submit" name="cancel" class="btn">Cancel</button>
+            <button type="submit" name="OK" value="1" class="btn btn-primary" ` + disTag[r.rwAccess] + `>OK</button>
+            <button type="submit" name="cancel" value="1" class="btn">Cancel</button>
             <input type="hidden" name="fn" value="` + action + `">
         </div>
     </div>
@@ -171,12 +171,11 @@ func (r *wfmRequest) editText() {
         <div>File Editor: ` + html.EscapeString(r.uFbn) + `</div>
     </div>
     <div class="editor-content">
-        <pre id="wfmEditor" contenteditable="true">` + html.EscapeString(string(f)) + `</pre>
-        <textarea name="text" id="wfmEditorInput" style="display:none;">` + html.EscapeString(string(f)) + `</textarea>
+        <textarea name="text" id="wfmEditorInput" class="editor-textarea">` + html.EscapeString(string(f)) + `</textarea>
     </div>
     <div class="editor-header" style="justify-content: flex-end; gap: 0.5rem;">
-        <button type="submit" name="save" class="btn btn-primary" ` + disTag[r.rwAccess] + `>Save</button>
-        <button type="submit" name="cancel" class="btn">Cancel</button>
+        <button type="submit" name="save" value="1" class="btn btn-primary" ` + disTag[r.rwAccess] + `>Save</button>
+        <button type="submit" name="cancel" value="1" class="btn">Cancel</button>
         <input type="hidden" name="dir" value="` + html.EscapeString(r.uDir) + `">
         <input type="hidden" name="file" value="` + html.EscapeString(r.uFbn) + `">
     </div>
