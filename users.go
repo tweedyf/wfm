@@ -64,6 +64,46 @@ func userRW(username string) bool {
 	return true
 }
 
+// reloadHtpasswd re-reads the htpasswd file so external changes (e.g. htpasswd CLI) are visible without restart.
+func reloadHtpasswd() {
+	if htpasswdFile == nil {
+		return
+	}
+	if err := htpasswdFile.Reload(func(e error) { log.Printf("htpasswd reload: %v", e) }); err != nil {
+		log.Printf("htpasswd reload: %v", err)
+	}
+}
+
+// reloadACL re-reads the optional passwd_acl file so ACL changes are visible without restart.
+func reloadACL() {
+	if *passwdAcl == "" {
+		return
+	}
+	userACL = make(map[string]bool)
+	file, err := os.Open(*passwdAcl)
+	if err != nil {
+		log.Printf("passwd_acl reload: %v", err)
+		return
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.Fields(line)
+		if len(parts) >= 2 {
+			user := parts[0]
+			rw := strings.ToLower(parts[1]) == "rw"
+			userACL[user] = rw
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Printf("passwd_acl reload: %v", err)
+	}
+}
+
 func manageUsers() {
 	switch flag.Arg(1) {
 	case "list":

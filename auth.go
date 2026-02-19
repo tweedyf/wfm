@@ -90,10 +90,13 @@ func clearSessionCookie(w http.ResponseWriter) {
 }
 
 // verifyLogin checks username and password against the htpasswd file. Returns (rw, true) on success, (false, false) on failure.
+// Reloads the htpasswd and ACL files before checking so external changes (e.g. htpasswd CLI) are visible without restart.
 func verifyLogin(username, password string) (rw bool, ok bool) {
 	if htpasswdFile == nil {
 		return false, false
 	}
+	reloadHtpasswd()
+	reloadACL()
 	if !htpasswdFile.Match(username, password) {
 		return false, false
 	}
