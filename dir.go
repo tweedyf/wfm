@@ -208,7 +208,7 @@ func (r *wfmRequest) listFiles(hi string) {
 // headerUserAndLogout returns HTML for the header: username (clickable to open change-password modal when not n/a) and logout link.
 func headerUserAndLogout(user string, i map[string]string, qeDir string) string {
 	escUser := html.EscapeString(user)
-	logoutLink := `<a href="` + wfmPfx + `?fn=logout" class="header-logout" title="Log out">` + i["tlogout"] + ` <span class="btn-text">Logout</span></a>`
+	logoutLink := `<a href="` + wfmPfx + `?fn=logout" class="header-logout" title="Log out">Logout ` + i["tlogout"] + ` <span class="btn-text">Logout</span></a>`
 	if user == "n/a" {
 		return `<span class="header-user">` + i["tid"] + escUser + `</span> ` + logoutLink
 	}
@@ -338,22 +338,22 @@ func icons(m bool) map[string]string {
 	}
 
 	return map[string]string{
-		"fi":  " ",
-		"di":  " ",
-		"li":  " (link)",
-		"rm":  "[rm]",
-		"mv":  "[mv]",
-		"re":  "[re]",
-		"ed":  "[ed]",
-		"dn":  "[dn]",
-		"tup": "^ ",
-		"tho": "~ ",
-		"tre": "&reg; ",
+		"fi":      " ",
+		"di":      " ",
+		"li":      " (link)",
+		"rm":      "[rm]",
+		"mv":      "[mv]",
+		"re":      "[re]",
+		"ed":      "[ed]",
+		"dn":      "[dn]",
+		"tup":     "^ ",
+		"tho":     "~ ",
+		"tre":     "&reg; ",
 		"tid":     "User: ",
 		"tlogout": "[logout] ",
 		"tve":     "WFM ",
-		"rw":  "[rw]",
-		"ro":  "[ro]",
+		"rw":      "[rw]",
+		"ro":      "[ro]",
 	}
 }
 
