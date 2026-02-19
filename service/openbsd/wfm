@@ -1,0 +1,16 @@
+#!/bin/ksh
+#
+# wfm openbsd rc file
+# copy to /etc/rc.d/wfm
+# Use rcctl enable wfm and rcctl start wfm to enable+start this service:
+#
+
+daemon="/usr/local/bin/wfm"
+wfm_execdir=/var/www
+#wfm_flags='-addr :8888 -setuid=www -chroot /var/www/htdocs -passwd=/pass'
+
+rc_reload=NO
+
+. /etc/rc.d/rc.subr
+
+rc_cmd $1
