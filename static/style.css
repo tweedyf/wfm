@@ -488,7 +488,6 @@ body.drag-over .drop-overlay {
   justify-content: center;
   padding: var(--spacing);
   background: var(--bg-alt);
-  margin: 1em;
 }
 
 .login-box {
@@ -499,6 +498,7 @@ body.drag-over .drop-overlay {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: 0 4px 12px var(--shadow);
+  margin: 1em;
 }
 
 .login-title {
