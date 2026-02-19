@@ -99,6 +99,7 @@ func (r *wfmRequest) listFiles(hi string) {
 		}
 		r.w.Write([]byte(`
         <li class="file-item dir` + highlight + `">
+            <div class="file-item-icon" aria-hidden="true">` + i["di"] + `</div>
             <div class="file-name">
                 <input type="checkbox" name="mulf" value="` + heFile + `" id="cb-dir-` + heFile + `">
                 <a href="` + nUrl + `">` + i["di"] + heFile + `/</a>` + li + `
@@ -157,6 +158,7 @@ func (r *wfmRequest) listFiles(hi string) {
 		}
 		r.w.Write([]byte(`
         <li class="file-item` + highlight + `">
+            <div class="file-item-icon" aria-hidden="true">` + fileIcon(qeFile, r.modern) + `</div>
             <div class="file-name">
                 <input type="checkbox" name="mulf" value="` + heFile + `" id="cb-file-` + heFile + `">
                 <a href="` + fileUrl + `">` + fileIcon(qeFile, r.modern) + ` ` + heFile + `</a>` + li + `
