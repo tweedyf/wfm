@@ -205,6 +205,16 @@ func (r *wfmRequest) listFiles(hi string) {
 	footer(r.w)
 }
 
+// headerUserAndLogout returns HTML for the header: username (clickable to open change-password modal when not n/a) and logout link.
+func headerUserAndLogout(user string, i map[string]string, qeDir string) string {
+	escUser := html.EscapeString(user)
+	logoutLink := `<a href="` + wfmPfx + `?fn=logout" class="header-logout" title="Log out">` + i["tlogout"] + ` <span class="btn-text">Logout</span></a>`
+	if user == "n/a" {
+		return `<span class="header-user">` + i["tid"] + escUser + `</span> ` + logoutLink
+	}
+	return `<a href="#" id="headerChangePassword" class="header-user" title="Change password">` + i["tid"] + escUser + `</a> ` + logoutLink
+}
+
 func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[string]string, rw bool) {
 	eDir := html.EscapeString(uDir)
 	qeDir := url.PathEscape(uDir)
@@ -214,7 +224,7 @@ func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[strin
     <div class="header-title">` + html.EscapeString(*siteName) + ` : ` + eDir + `</div>
     <div class="header-actions">
         <span>` + i[rorw[rw]] + `</span>
-        <a href="` + wfmPfx + `?fn=logout">` + i["tid"] + html.EscapeString(user) + `</a>
+        ` + headerUserAndLogout(user, i, qeDir) + `
         <a href="` + wfmPfx + `?fn=about&amp;dir=` + qeDir + `&amp;sort=">` + i["tve"] + ` WFM v` + vers + `</a>
     </div>
 </header>
@@ -318,8 +328,9 @@ func icons(m bool) map[string]string {
 			"tdi": fa("fa-folder-plus") + " ",
 			"tul": fa("fa-upload") + " ",
 
-			"tid": fa("fa-user") + " ",
-			"tve": fa("fa-circle-info") + " ",
+			"tid":     fa("fa-user") + " ",
+			"tlogout": fa("fa-right-from-bracket") + " ",
+			"tve":     fa("fa-circle-info") + " ",
 
 			"rw": fa("fa-lock-open") + " rw",
 			"ro": fa("fa-lock") + " ro",
@@ -338,8 +349,9 @@ func icons(m bool) map[string]string {
 		"tup": "^ ",
 		"tho": "~ ",
 		"tre": "&reg; ",
-		"tid": "User: ",
-		"tve": "WFM ",
+		"tid":     "User: ",
+		"tlogout": "[logout] ",
+		"tve":     "WFM ",
 		"rw":  "[rw]",
 		"ro":  "[ro]",
 	}

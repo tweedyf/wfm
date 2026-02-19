@@ -37,8 +37,9 @@ var (
 	siteName   = flag.String("site_name", "WFM", "local site name to display")
 	siteDesc   = flag.String("site_desc", "Web File Manager", "site description")
 	logFile    = flag.String("logfile", "", "Log file name (default stdout)")
-	passwdDb   = flag.String("passwd", "", "wfm password file, eg: /usr/local/etc/wfmpw.json")
-	noPwdDbRW  = flag.Bool("nopass_rw", false, "allow read-write access if there is no password file")
+	passwdDb    = flag.String("passwd", "", "htpasswd-style password file (create with htpasswd(1))")
+	passwdAcl   = flag.String("passwd_acl", "", "optional: file listing per-user rw/ro, one line per user: 'username rw' or 'username ro'")
+	noPwdDbRW   = flag.Bool("nopass_rw", false, "allow read-write access if there is no password file")
 	aboutRnt   = flag.Bool("about_runtime", true, "Display runtime info in About Dialog")
 	showDot    = flag.Bool("show_dot", false, "show dot files and folders")
 	listArc    = flag.Bool("list_archive_contents", false, "list contents of archives (expensive!)")
@@ -54,8 +55,10 @@ var (
 	acmBind    = flag.String("acm_addr", "", "autocert manager listen address, eg: :80")
 	acmWhlist  multiString // this flag set in main
 	fastCgi    = flag.Bool("fastcgi", false, "enable FastCGI mode")
-	f2bEnabled = flag.Bool("f2b", true, "ban ip addresses on user/pass failures")
-	f2bDump    = flag.String("f2b_dump", "", "enable f2b dump at this prefix, eg. /f2bdump (default no)")
+	f2bEnabled   = flag.Bool("f2b", true, "ban ip addresses on user/pass failures")
+	f2bDump      = flag.String("f2b_dump", "", "enable f2b dump at this prefix, eg. /f2bdump (default no)")
+	sessionSecret = flag.String("session_secret", "", "secret for signing session cookies (default: insecure default)")
+	sessionMaxAge = flag.Int("session_max_age", 24*60*60, "session cookie max age in seconds (default 24h)")
 )
 
 func userId(usr string) (int, int, error) {

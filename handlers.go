@@ -25,6 +25,18 @@ type wfmRequest struct {
 
 func wfmMain(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(*formMaxMem)
+
+	// Handle login form POST before auth
+	if r.FormValue("fn") == "login" && r.Method == http.MethodPost && r.FormValue("login") == "1" {
+		handleLoginPOST(w, r)
+		return
+	}
+	// Handle logout: clear session and redirect to login
+	if r.FormValue("fn") == "logout" {
+		logout(w, r)
+		return
+	}
+
 	uName, uAccess := auth(w, r)
 	if uName == "" {
 		return
@@ -150,12 +162,46 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 	case "multi_move":
 		wfm.moveFiles(r.Form["mulf"], r.FormValue("dst"))
 	case "logout":
-		logout(w)
+		logout(w, r)
+	case "chpass":
+		handleChpass(w, r, wfm)
 	case "about":
 		wfm.about(r.UserAgent())
 	default:
 		wfm.dispOrDir(filepath.Base(r.FormValue("hi")))
 	}
+}
+
+func handleChpass(w http.ResponseWriter, r *http.Request, wfm *wfmRequest) {
+	newPass := r.FormValue("new_pass")
+	confirmPass := r.FormValue("confirm_pass")
+	if newPass != confirmPass {
+		redirectWithChpassError(w, wfm, "New passwords do not match")
+		return
+	}
+	if len(newPass) == 0 {
+		redirectWithChpassError(w, wfm, "New password cannot be empty")
+		return
+	}
+	err := updateUserPassword(wfm.userName, r.FormValue("current_pass"), newPass)
+	if err != nil {
+		redirectWithChpassError(w, wfm, err.Error())
+		return
+	}
+	redirect(w, redirectURL(wfm))
+}
+
+func redirectURL(wfm *wfmRequest) string {
+	u := wfmPfx + "?dir=" + url.PathEscape(wfm.uDir)
+	if wfm.eSort != "" {
+		u += "&sort=" + wfm.eSort
+	}
+	return u
+}
+
+func redirectWithChpassError(w http.ResponseWriter, wfm *wfmRequest, msg string) {
+	u := redirectURL(wfm) + "&chpass_error=" + url.QueryEscape(msg)
+	redirect(w, u)
 }
 
 func unescapeOrEmpty(s string) string {

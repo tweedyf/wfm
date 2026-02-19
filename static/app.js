@@ -192,15 +192,83 @@
     }
   }
 
+  function initChangePasswordModal() {
+    var trigger = document.getElementById('headerChangePassword');
+    var modal = document.getElementById('changePasswordModal');
+    var cancelBtn = document.getElementById('changePasswordCancel');
+    var form = document.getElementById('changePasswordForm');
+    var errEl = document.getElementById('changePasswordError');
+    if (!modal) return;
+
+    function showModal() {
+      modal.classList.add('visible');
+      modal.setAttribute('aria-hidden', 'false');
+      if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+      if (form) form.reset();
+      var mainForm = document.getElementById('wfmForm');
+      if (form && mainForm) {
+        var dirInput = mainForm.querySelector('input[name="dir"]');
+        var sortInput = mainForm.querySelector('input[name="sort"]');
+        var chpassDir = form.querySelector('input[name="dir"]');
+        var chpassSort = form.querySelector('input[name="sort"]');
+        if (dirInput && chpassDir) chpassDir.value = dirInput.value || '';
+        if (sortInput && chpassSort) chpassSort.value = sortInput.value || '';
+      }
+    }
+    function hideModal() {
+      modal.classList.remove('visible');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    if (trigger) {
+      trigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        showModal();
+      });
+    }
+    if (cancelBtn) cancelBtn.addEventListener('click', hideModal);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideModal();
+    });
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        var newPass = form.querySelector('input[name="new_pass"]');
+        var confirmPass = form.querySelector('input[name="confirm_pass"]');
+        if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+        if (newPass && confirmPass && newPass.value !== confirmPass.value) {
+          e.preventDefault();
+          errEl.textContent = 'New passwords do not match.';
+          errEl.style.display = 'block';
+          return;
+        }
+      });
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var chpassError = params.get('chpass_error');
+    if (chpassError) {
+      showModal();
+      if (errEl) {
+        errEl.textContent = decodeURIComponent(chpassError);
+        errEl.style.display = 'block';
+      }
+      params.delete('chpass_error');
+      var newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+      window.history.replaceState({}, '', newUrl);
+    }
+  }
+
   // Initialize on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       initUploadReplaceModal();
+      initChangePasswordModal();
       initDragDrop();
       initCheckboxes();
     });
   } else {
     initUploadReplaceModal();
+    initChangePasswordModal();
     initDragDrop();
     initCheckboxes();
   }

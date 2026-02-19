@@ -73,6 +73,35 @@ func header(w http.ResponseWriter, uDir, sort, extraCSS string, modern bool) {
 
 func footer(w http.ResponseWriter) {
 	w.Write([]byte(`
+<div class="modal-overlay change-password-modal" id="changePasswordModal" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">Change password</div>
+    <div class="modal-body">
+      <form method="POST" action="` + joinPath(wfmPfx, "/") + `" id="changePasswordForm" class="change-password-form">
+        <input type="hidden" name="fn" value="chpass">
+        <input type="hidden" name="dir" id="chpass_dir" value="">
+        <input type="hidden" name="sort" id="chpass_sort" value="">
+        <div class="form-group">
+          <label for="chpass_current">Current password</label>
+          <input type="password" id="chpass_current" name="current_pass" autocomplete="current-password" required>
+        </div>
+        <div class="form-group">
+          <label for="chpass_new">New password</label>
+          <input type="password" id="chpass_new" name="new_pass" autocomplete="new-password" required minlength="1">
+        </div>
+        <div class="form-group">
+          <label for="chpass_confirm">Confirm new password</label>
+          <input type="password" id="chpass_confirm" name="confirm_pass" autocomplete="new-password" required>
+        </div>
+        <p id="changePasswordError" class="login-error" style="display:none;"></p>
+        <div class="modal-footer">
+          <button type="submit" name="chpass" value="1" class="btn btn-primary">Change password</button>
+          <button type="button" id="changePasswordCancel" class="btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 <script src="` + joinPath(wfmPfx, "/static/app.js") + `"></script>
 </form>
 </body>

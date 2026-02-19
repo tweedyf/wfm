@@ -87,6 +87,14 @@ a:hover {
   text-decoration: none;
 }
 
+.header-user {
+  cursor: pointer;
+}
+
+.header-logout {
+  margin-left: 0.5rem;
+}
+
 .header-actions span {
   display: none;
 }
@@ -295,6 +303,14 @@ a:hover {
   display: flex;
 }
 
+.change-password-modal {
+  display: none;
+}
+
+.change-password-modal.visible {
+  display: flex;
+}
+
 .modal {
   background: white;
   border-radius: var(--radius);
@@ -463,6 +479,77 @@ body.drag-over .drop-overlay {
   margin-top: 1rem;
 }
 
+/* Login page */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing);
+  background: var(--bg-alt);
+  margin: 1em;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 22rem;
+  padding: 2rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.login-title {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.login-subtitle {
+  margin: 0 0 1.25rem 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.login-error {
+  padding: 0.5rem 0;
+  margin: 0 0 0.75rem 0;
+  color: var(--danger);
+  font-size: 0.875rem;
+}
+
+.login-form label {
+  display: block;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.login-form .btn-block {
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.6rem;
+}
+
 /* Sort indicators */
 .sort-indicator {
   display: inline-block;
@@ -493,6 +580,10 @@ body.drag-over .drop-overlay {
   }
   
   .toolbar .btn-text {
+    display: none;
+  }
+
+  .header-logout .btn-text {
     display: none;
   }
   
