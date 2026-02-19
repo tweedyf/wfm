@@ -208,7 +208,7 @@ func (r *wfmRequest) listFiles(hi string) {
 // headerUserAndLogout returns HTML for the header: username (clickable to open change-password modal when not n/a) and logout link.
 func headerUserAndLogout(user string, i map[string]string, qeDir string) string {
 	escUser := html.EscapeString(user)
-	logoutLink := `<a href="` + wfmPfx + `?fn=logout" class="header-logout" title="Log out">Logout ` + i["tlogout"] + ` <span class="btn-text">Logout</span></a>`
+	logoutLink := `<a href="` + wfmPfx + `?fn=logout" class="header-logout" title="Log out">` + i["tlogout"] + ` Logout <span class="btn-text">Logout</span></a>`
 	if user == "n/a" {
 		return `<span class="header-user">` + i["tid"] + escUser + `</span> ` + logoutLink
 	}
