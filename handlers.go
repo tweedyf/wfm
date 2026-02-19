@@ -126,13 +126,19 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 		wfm.uDir = "/"
 		wfm.listFiles(filepath.Base(r.FormValue("hi")))
 		return
-	case r.FormValue("cancel") != "":
+	case r.FormValue("cancel") != "" || r.FormValue("fn") == "cancel":
 		wfm.listFiles(filepath.Base(r.FormValue("hi")))
 		return
 	}
 
 	// form action submitted
-	switch r.FormValue("fn") {
+	fn := r.FormValue("fn")
+	modalCancel := r.FormValue("cancel") != "" || r.FormValue("modal_confirm") == "0"
+	if modalCancel && (fn == "mkdir" || fn == "mkfile" || fn == "mkurl" || fn == "rename" || fn == "move" || fn == "delete" || fn == "multi_delete" || fn == "multi_move") {
+		wfm.listFiles("")
+		return
+	}
+	switch fn {
 	case "disp":
 		wfm.dispFile()
 	case "down":

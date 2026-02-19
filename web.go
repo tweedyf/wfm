@@ -73,6 +73,7 @@ func header(w http.ResponseWriter, uDir, sort, extraCSS string, modern bool) {
 
 func footer(w http.ResponseWriter) {
 	w.Write([]byte(`
+</form>
 <div class="modal-overlay change-password-modal" id="changePasswordModal" aria-hidden="true">
   <div class="modal">
     <div class="modal-header">Change password</div>
@@ -103,7 +104,6 @@ func footer(w http.ResponseWriter) {
   </div>
 </div>
 <script src="` + joinPath(wfmPfx, "/static/app.js") + `"></script>
-</form>
 </body>
 </html>
 `))

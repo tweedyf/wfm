@@ -138,9 +138,10 @@ func (r *wfmRequest) prompt(action string, mul []string) {
 	r.w.Write([]byte(`
         </div>
         <div class="modal-footer">
-            <button type="submit" name="OK" value="1" class="btn btn-primary" ` + disTag[r.rwAccess] + `>OK</button>
-            <button type="submit" name="cancel" value="1" class="btn">Cancel</button>
+            <input type="hidden" name="modal_confirm" id="modalConfirm" value="">
             <input type="hidden" name="fn" value="` + action + `">
+            <button type="submit" name="OK" value="1" class="btn btn-primary modal-ok">OK</button>
+            <button type="submit" name="cancel" value="1" class="btn modal-cancel">Cancel</button>
         </div>
     </div>
 </div>
