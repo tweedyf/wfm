@@ -215,7 +215,7 @@ func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[strin
     <div class="header-actions">
         <span>` + i[rorw[rw]] + `</span>
         <a href="` + wfmPfx + `?fn=logout">` + i["tid"] + html.EscapeString(user) + `</a>
-        <a href="` + wfmPfx + `?fn=about&amp;dir=` + qeDir + `&amp;sort=">` + i["tve"] + ` v` + vers + `</a>
+        <a href="` + wfmPfx + `?fn=about&amp;dir=` + qeDir + `&amp;sort=">` + i["tve"] + ` WFM v` + vers + `</a>
     </div>
 </header>
 `))
@@ -327,21 +327,21 @@ func icons(m bool) map[string]string {
 	}
 
 	return map[string]string{
-		"fi": " ",
-		"di": " ",
-		"li": " (link)",
-		"rm": "[rm]",
-		"mv": "[mv]",
-		"re": "[re]",
-		"ed": "[ed]",
-		"dn": "[dn]",
+		"fi":  " ",
+		"di":  " ",
+		"li":  " (link)",
+		"rm":  "[rm]",
+		"mv":  "[mv]",
+		"re":  "[re]",
+		"ed":  "[ed]",
+		"dn":  "[dn]",
 		"tup": "^ ",
 		"tho": "~ ",
 		"tre": "&reg; ",
 		"tid": "User: ",
 		"tve": "WFM ",
-		"rw": "[rw]",
-		"ro": "[ro]",
+		"rw":  "[rw]",
+		"ro":  "[ro]",
 	}
 }
 
