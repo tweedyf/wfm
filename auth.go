@@ -140,7 +140,7 @@ func serveLoginPage(w http.ResponseWriter, r *http.Request, errorMsg string) {
     </form>
   </div>
   <div class="login-box">
-    <mark>Notice: the file manager uses cookies for logging in and out</mark>
+    Notice: the file manager uses cookies for logging in and out.
   </div>
 </div>
 </body>
