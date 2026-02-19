@@ -168,16 +168,16 @@ func (r *wfmRequest) editText() {
 	r.w.Write([]byte(`
 <div class="editor-container">
     <div class="editor-header">
-        <div>File Editor: ` + html.EscapeString(r.uFbn) + `</div>
+        <div class="editor-title">File Editor: ` + html.EscapeString(r.uFbn) + `</div>
+        <div class="editor-actions">
+            <button type="submit" name="save" value="1" class="btn btn-primary" ` + disTag[r.rwAccess] + `>Save</button>
+            <button type="submit" name="cancel" value="1" class="btn">Cancel</button>
+        </div>
+        <input type="hidden" name="dir" value="` + html.EscapeString(r.uDir) + `">
+        <input type="hidden" name="file" value="` + html.EscapeString(r.uFbn) + `">
     </div>
     <div class="editor-content">
         <textarea name="text" id="wfmEditorInput" class="editor-textarea">` + html.EscapeString(string(f)) + `</textarea>
-    </div>
-    <div class="editor-header" style="justify-content: flex-end; gap: 0.5rem;">
-        <button type="submit" name="save" value="1" class="btn btn-primary" ` + disTag[r.rwAccess] + `>Save</button>
-        <button type="submit" name="cancel" value="1" class="btn">Cancel</button>
-        <input type="hidden" name="dir" value="` + html.EscapeString(r.uDir) + `">
-        <input type="hidden" name="file" value="` + html.EscapeString(r.uFbn) + `">
     </div>
 </div>
     `))
