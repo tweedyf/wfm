@@ -37,7 +37,7 @@ var (
 	siteName   = flag.String("site_name", "WFM", "local site name to display")
 	siteDesc   = flag.String("site_desc", "Web File Manager", "site description")
 	logFile    = flag.String("logfile", "", "Log file name (default stdout)")
-	passwdDb    = flag.String("passwd", "", "htpasswd-style password file (create with htpasswd(1))")
+	passwdDb    = flag.String("passwd", "", "htpasswd-style password file (create with htpasswd(1)); with -chroot, path is inside chroot (e.g. /etc/wfm.passwd)")
 	passwdAcl   = flag.String("passwd_acl", "", "optional: file listing per-user rw/ro, one line per user: 'username rw' or 'username ro'")
 	noPwdDbRW   = flag.Bool("nopass_rw", false, "allow read-write access if there is no password file")
 	aboutRnt   = flag.Bool("about_runtime", true, "Display runtime info in About Dialog")
@@ -142,10 +142,6 @@ func main() {
 		return
 	}
 
-	if *passwdDb != "" {
-		loadUsers()
-	}
-
 	if *logFile != "" {
 		lf, err := os.OpenFile(*logFile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 		if err != nil {
@@ -208,6 +204,12 @@ func main() {
 			log.Fatal("you probably dont want to run wfm as root, use --allow_root flag to force it")
 		}
 		log.Printf("Setuid UID=%d GID=%d", os.Geteuid(), os.Getgid())
+	}
+
+	// Load password file after chroot (and setuid) so -passwd path is resolved inside chroot.
+	// When using -chroot, place the passwd file inside the chroot (e.g. -passwd=/etc/wfm.passwd → chroot/etc/wfm.passwd).
+	if *passwdDb != "" {
+		loadUsers()
 	}
 
 	// rate limit setup
