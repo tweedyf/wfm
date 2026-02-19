@@ -353,7 +353,7 @@ func isEditableTextFile(name string) bool {
 	}
 	ext := strings.ToLower(s[len(s)-1])
 	switch ext {
-	case "txt", "log", "csv", "md", "mhtml", "html", "htm", "cfg", "conf", "ini", "json", "xml", "js":
+	case "txt", "log", "csv", "md", "mhtml", "html", "htm", "css", "cfg", "conf", "ini", "json", "xml", "js":
 		return true
 	}
 	return false
