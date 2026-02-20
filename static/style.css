@@ -586,7 +586,20 @@ body.drag-over .drop-overlay {
   /* Toolbar: keep horizontal row, hide button text (icons only) */
   .toolbar {
     flex-wrap: wrap;
-    gap: 0.5rem;
+	justify-content: space-between;
+    gap: 1rem;
+  }
+  
+  .toolbar .btn {
+	  width: 15%;
+  }
+  
+  .toolbar input[name=filename] {
+	  flex-basis: 80%;
+  }
+  
+  .toolbar button[name=mkf] {
+    margin-right: max(auto,50px);
   }
   
   .toolbar .btn-text {
@@ -612,7 +625,6 @@ body.drag-over .drop-overlay {
   
   .toolbar .btn-file {
     padding: 0.5rem;
-    max-width: 7rem;
   }
   
   /* File list header: name | size on row 1, Actions centered on row 2 */
