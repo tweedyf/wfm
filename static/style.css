@@ -569,6 +569,16 @@ body.drag-over .drop-overlay {
 }
 
 @media (max-width: 768px) {
+	.header-actions a {
+		font-size: 1px;
+		visibility: hidden;
+	}
+	
+	.header-actions a i {
+		font-size: large;
+		visibility: initial;
+	}
+  
   .file-list-container {
     width: 100%;
   }
@@ -581,6 +591,14 @@ body.drag-over .drop-overlay {
   
   .toolbar .btn-text {
     display: none;
+  }
+  
+  .toolbar button[name=mdelp], .toolbar button[name=mmovp] {
+    display: none;
+  }
+  
+  .toolbar button i {
+    font-size: large;
   }
 
   .header-logout .btn-text {
