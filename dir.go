@@ -168,9 +168,13 @@ func (r *wfmRequest) listFiles(hi string) {
                 <a href="` + wfmPfx + `?fn=down&amp;dir=` + qeDir + `&amp;file=` + qeFile + `" class="action-link" title="Download">` + i["dn"] + `</a>
 		`))
 		if r.rwAccess {
+			editLink := ""
+			if isEditableTextFile(f.Name()) {
+				editLink = `<a href="` + wfmPfx + `?fn=edit&amp;dir=` + qeDir + `&amp;file=` + qeFile + `&amp;sort=` + r.eSort + `" class="action-link" title="Edit">` + i["ed"] + `</a>
+                `
+			}
 			r.w.Write([]byte(`
-                <a href="` + wfmPfx + `?fn=edit&amp;dir=` + qeDir + `&amp;file=` + qeFile + `&amp;sort=` + r.eSort + `" class="action-link" title="Edit">` + i["ed"] + `</a>
-                <a href="` + wfmPfx + `?fn=renp&amp;dir=` + qeDir + `&amp;file=` + qeFile + `&amp;sort=` + r.eSort + `" class="action-link" title="Rename">` + i["re"] + `</a>
+                ` + editLink + `<a href="` + wfmPfx + `?fn=renp&amp;dir=` + qeDir + `&amp;file=` + qeFile + `&amp;sort=` + r.eSort + `" class="action-link" title="Rename">` + i["re"] + `</a>
                 <a href="` + wfmPfx + `?fn=movp&amp;dir=` + qeDir + `&amp;file=` + qeFile + `&amp;sort=` + r.eSort + `" class="action-link" title="Move">` + i["mv"] + `</a>
                 <a href="` + wfmPfx + `?fn=delp&amp;dir=` + qeDir + `&amp;file=` + qeFile + `&amp;sort=` + r.eSort + `" class="action-link action-delete" title="Delete">` + i["rm"] + `</a>
 		`))
@@ -364,11 +368,7 @@ func isEditableTextFile(name string) bool {
 		return false
 	}
 	ext := strings.ToLower(s[len(s)-1])
-	switch ext {
-	case "txt", "log", "csv", "md", "mhtml", "html", "htm", "css", "cfg", "conf", "ini", "json", "xml", "js":
-		return true
-	}
-	return false
+	return editExtSet[ext]
 }
 
 func fileIcon(f string, m bool) string {

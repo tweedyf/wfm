@@ -120,7 +120,7 @@ func writeUploadRejectedPage(w http.ResponseWriter, uDir, eSort, filename string
 <div class="upload-error">
     <p class="upload-error-title">Upload rejected</p>
     <p>The file <strong>` + html.EscapeString(filename) + `</strong> was not uploaded.</p>
-    <p>Only text, PDF, and image files are allowed.</p>
+    <p>File type not in allowed upload list.</p>
     <p><a href="` + html.EscapeString(backURL) + `" class="btn btn-primary">Back to directory</a></p>
 </div>
 `))

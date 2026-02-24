@@ -1,0 +1,96 @@
+# WFM configuration example
+# Copy to /etc/wfm.conf and uncomment/edit as needed.
+# Format: key value or key=value. Precedence: CLI > this file > built-in defaults.
+# Lines starting with # are ignored.
+
+# --- Listen & bind ---
+# proto (default: tcp) — tcp, tcp4, tcp6, etc
+# proto tcp
+# addr (default: :8080) — listen address, e.g. :443
+# addr :8080
+# addr_extra (default: empty) — extra non-TLS listener, e.g. :8081
+# addr_extra
+
+# --- Chroot & setuid ---
+# chroot (default: empty) — directory to chroot to
+# chroot
+# setuid (default: empty) — username or uid:gid to setuid to
+# setuid
+# allow_root (default: false) — allow running as root without setuid
+# allow_root false
+# chroot_users (default: admin) — comma-separated usernames with full chroot access; others get /username subdir
+# chroot_users admin
+
+# --- Site ---
+# site_name (default: WFM) — name shown in UI
+# site_name WFM
+# site_desc (default: Web File Manager) — site description
+# site_desc Web File Manager
+
+# --- Logging ---
+# logfile (default: empty) — log file path; empty = stdout
+# logfile
+
+# --- Auth ---
+# passwd (default: empty) — htpasswd-style password file path (inside chroot if using chroot)
+# passwd
+# passwd_acl (default: empty) — optional file with lines "username rw" or "username ro"
+# passwd_acl
+# nopass_rw (default: false) — allow read-write when no password file
+# nopass_rw false
+
+# --- UI & behavior ---
+# about_runtime (default: true) — show runtime info in About dialog
+# about_runtime true
+# show_dot (default: false) — show dot files and folders
+# show_dot false
+# list_archive_contents (default: false) — list contents of archives (expensive)
+# list_archive_contents false
+
+# --- Editor & upload ---
+# edit_ext (default: empty) — comma-separated extensions that open in web editor; empty = none
+# edit_ext
+# upload_ext (default: txt,log,csv,md,...,pdf,png,jpg,...) — comma-separated extensions allowed for upload
+# upload_ext txt,log,csv,md,markdown,mdown,html,htm,xml,json,js,css,cfg,conf,ini,yaml,yml,rst,tex,text,pdf,png,jpg,jpeg,gif,webp,bmp,ico,tif,tiff,heif,heic,svg
+
+# --- Rate & form ---
+# rate_limit (default: 0) — upload/download limit in MB/s; 0 = no limit
+# rate_limit 0
+# form_maxmem (default: 10485760) — max memory for form parsing (bytes)
+# form_maxmem 10485760
+
+# --- Paths ---
+# prefix (default: /:/) — fsdir:httppath e.g. /var/files:/myfiles
+# prefix /:/
+# txt_le (default: LF) — default line endings when editing text (LF or CRLF)
+# txt_le LF
+
+# --- Debug ---
+# dump_headers (default: false) — dump client request headers
+# dump_headers false
+
+# --- Cache & TLS ---
+# cache_ctl (default: no-cache) — HTTP Cache-Control header
+# cache_ctl no-cache
+# acm_file (default: empty) — autocert cache file, e.g. /var/cache/wfm-acme.json
+# acm_file
+# acm_addr (default: empty) — autocert manager listen address, e.g. :80
+# acm_addr
+# acm_host — allowed hostname for autocert (repeat line for multiple hosts)
+# acm_host example.com
+
+# --- Server mode ---
+# fastcgi (default: false) — enable FastCGI
+# fastcgi false
+
+# --- Fail2ban ---
+# f2b (default: true) — ban IPs on auth failures
+# f2b true
+# f2b_dump (default: empty) — enable f2b dump at path, e.g. /f2bdump
+# f2b_dump
+
+# --- Session ---
+# session_secret (default: empty) — secret for signing session cookies
+# session_secret
+# session_max_age (default: 86400) — session cookie max age in seconds
+# session_max_age 86400

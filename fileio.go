@@ -121,23 +121,14 @@ func streamFile(w http.ResponseWriter, uFilePath string, wfs afero.Fs) {
 	}
 }
 
-// allowedUploadExt returns true if the file extension is allowed for upload (text, PDF, or image).
+// allowedUploadExt returns true if the file extension is allowed for upload.
 func allowedUploadExt(filename string) bool {
 	ext := strings.ToLower(filepath.Ext(filename))
 	if ext == "" {
 		return false
 	}
 	ext = ext[1:] // drop leading dot
-	allowed := map[string]bool{
-		"txt": true, "log": true, "csv": true, "md": true, "markdown": true, "mdown": true,
-		"html": true, "htm": true, "xml": true, "json": true, "js": true, "css": true,
-		"cfg": true, "conf": true, "ini": true, "yaml": true, "yml": true, "rst": true,
-		"tex": true, "text": true,
-		"pdf": true,
-		"png": true, "jpg": true, "jpeg": true, "gif": true, "webp": true, "bmp": true,
-		"ico": true, "tif": true, "tiff": true, "heif": true, "heic": true, "svg": true,
-	}
-	return allowed[ext]
+	return uploadExtSet[ext]
 }
 
 func (r *wfmRequest) uploadFile(h *multipart.FileHeader, f multipart.File) {

@@ -59,7 +59,19 @@ var (
 	f2bDump      = flag.String("f2b_dump", "", "enable f2b dump at this prefix, eg. /f2bdump (default no)")
 	sessionSecret = flag.String("session_secret", "", "secret for signing session cookies (default: insecure default)")
 	sessionMaxAge = flag.Int("session_max_age", 24*60*60, "session cookie max age in seconds (default 24h)")
+
+	chrootUsers = flag.String("chroot_users", "admin", "comma-separated usernames that have access to chroot root; others are limited to a subdirectory named by username")
+	editExt     = flag.String("edit_ext", "", "comma-separated file extensions that open in the web editor (e.g. txt,md,html); default empty means none")
+	uploadExt   = flag.String("upload_ext", defaultUploadExt, "comma-separated file extensions allowed for upload")
 )
+
+var (
+	chrootUsersSet map[string]bool // set of usernames with full chroot access
+	editExtSet     map[string]bool // set of extensions that open in editor (lowercase)
+	uploadExtSet   map[string]bool // set of extensions allowed for upload (lowercase)
+)
+
+const defaultUploadExt = "txt,log,csv,md,markdown,mdown,html,htm,xml,json,js,css,cfg,conf,ini,yaml,yml,rst,tex,text,pdf,png,jpg,jpeg,gif,webp,bmp,ico,tif,tiff,heif,heic,svg"
 
 func userId(usr string) (int, int, error) {
 	u, err := user.Lookup(usr)
@@ -129,12 +141,27 @@ func atoiOrFatal(s string) int {
 	return i
 }
 
+// hasChrootAccess returns true if the username is in the chroot_users list (full access to chroot root).
+func hasChrootAccess(username string) bool {
+	return chrootUsersSet[username]
+}
+
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	log.Printf("WFM %v Starting up", vers)
 
+	// Precedence: defaults < /etc/wfm.conf < CLI. Prepend config file args so Parse() sees CLI last.
+	if cfgArgs := loadConfigArgs(defaultConfigPath); len(cfgArgs) > 0 {
+		os.Args = append(append([]string{os.Args[0]}, cfgArgs...), os.Args[1:]...)
+	}
+
 	flag.Var(&acmWhlist, "acm_host", "autocert manager allowed hostname (multi)")
 	flag.Parse()
+
+	chrootUsersSet = parseCommaSet(*chrootUsers, false)
+	editExtSet = parseCommaSet(*editExt, true)
+	uploadExtSet = parseCommaSet(*uploadExt, true)
+
 	var err error
 
 	if flag.Arg(0) == "user" {

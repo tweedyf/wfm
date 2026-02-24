@@ -51,7 +51,7 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fs := wfmFs
-	if uName != "" && uName != "n/a" && uName != "admin" {
+	if uName != "" && uName != "n/a" && !hasChrootAccess(uName) {
 		fs = afero.NewBasePathFs(fs, "/"+uName)
 	}
 
