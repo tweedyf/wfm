@@ -598,6 +598,11 @@ body.drag-over .drop-overlay {
   color: var(--text-muted, #666);
 }
 
+.login-form .reset-username {
+  background: var(--bg-muted, #f5f5f5);
+  cursor: default;
+}
+
 /* Sort indicators */
 .sort-indicator {
   display: inline-block;

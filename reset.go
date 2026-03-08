@@ -369,9 +369,11 @@ func serveResetPage(w http.ResponseWriter, r *http.Request, errorMsg string) {
     <h1 class="login-title">` + html.EscapeString(*siteName) + `</h1>
     <p class="login-subtitle">Set a new password for your account</p>
     ` + errHTML + `
-    <form method="POST" action="` + html.EscapeString(wfmPfx) + `" class="login-form">
+    <form method="POST" action="` + html.EscapeString(wfmPfx) + `" class="login-form" id="reset-password-form">
       <input type="hidden" name="fn" value="reset">
       <input type="hidden" name="token" value="` + html.EscapeString(token) + `">
+      <label for="wfm_reset_username">Account</label>
+      <input type="text" id="wfm_reset_username" class="reset-username" value="` + html.EscapeString(entry.Username) + `" readonly autocomplete="username" aria-label="Account (read-only)">
       <label for="suggested_pass">Suggested password</label>
       <div class="password-suggest-row">
         <input type="text" id="suggested_pass" class="suggested-password" readonly value="` + html.EscapeString(suggested) + `" aria-label="Suggested password (read-only, use Copy to copy)">
@@ -392,7 +394,6 @@ func serveResetPage(w http.ResponseWriter, r *http.Request, errorMsg string) {
 </body>
 </html>
 `))
-	_ = entry // entry is not currently displayed, but kept for potential future use.
 }
 
 func handleResetPOST(w http.ResponseWriter, r *http.Request) {
