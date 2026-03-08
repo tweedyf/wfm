@@ -112,6 +112,7 @@ a:hover {
 }
 
 .btn {
+  margin: 0.5rem 0;
   padding: 0.5rem 1rem;
   border: 1px solid var(--border);
   background: white;
@@ -335,7 +336,6 @@ a:hover {
 
 .modal-footer {
   padding: var(--spacing);
-  border-top: 1px solid var(--border);
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
@@ -520,6 +520,13 @@ body.drag-over .drop-overlay {
   font-size: 0.875rem;
 }
 
+.login-success {
+  padding: 0.5rem 0;
+  margin: 0 0 0.75rem 0;
+  color: var(--success);
+  font-size: 0.875rem;
+}
+
 .login-form label {
   display: block;
   margin-top: 0.75rem;
@@ -529,8 +536,11 @@ body.drag-over .drop-overlay {
 }
 
 .login-form input[type="text"],
-.login-form input[type="password"] {
+.login-form input[type="password"],
+.change-password-form input[type="password"],
+.login-form input[type="email"] {
   width: 100%;
+  margin: 0.5rem 0;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -578,6 +588,10 @@ body.drag-over .drop-overlay {
 		font-size: large;
 		visibility: initial;
 	}
+
+  .header-actions span.header-user {
+    display: none;
+  }
   
   .file-list-container {
     width: 100%;

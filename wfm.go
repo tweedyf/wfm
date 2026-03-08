@@ -40,6 +40,9 @@ var (
 	passwdDb    = flag.String("passwd", "", "htpasswd-style password file (create with htpasswd(1)); with -chroot, path is inside chroot (e.g. /etc/wfm.passwd)")
 	passwdAcl   = flag.String("passwd_acl", "", "optional: file listing per-user rw/ro, one line per user: 'username rw' or 'username ro'")
 	noPwdDbRW   = flag.Bool("nopass_rw", false, "allow read-write access if there is no password file")
+	passwdEmail = flag.String("passwd_email", "", "optional: file mapping emails to usernames; with -chroot defaults to /etc/wfm.emails inside chroot; format: one line per user 'username primary_email [secondary_email]'")
+	smtpServer  = flag.String("smtp_server", "localhost:25", "SMTP server for password reset and confirmation emails, e.g. localhost:25")
+	smtpFrom    = flag.String("smtp_from", "wfm@localhost", "From address for password reset and confirmation emails (set in flags or wfm.conf)")
 	aboutRnt   = flag.Bool("about_runtime", true, "Display runtime info in About Dialog")
 	showDot    = flag.Bool("show_dot", false, "show dot files and folders")
 	listArc    = flag.Bool("list_archive_contents", false, "list contents of archives (expensive!)")
@@ -237,6 +240,9 @@ func main() {
 	// When using -chroot, place the passwd file inside the chroot (e.g. -passwd=/etc/wfm.passwd → chroot/etc/wfm.passwd).
 	if *passwdDb != "" {
 		loadUsers()
+		if getPasswdEmailPath() != "" {
+			loadEmails()
+		}
 	}
 
 	// rate limit setup

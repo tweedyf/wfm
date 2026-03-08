@@ -130,7 +130,7 @@ func serveLoginPage(w http.ResponseWriter, r *http.Request, errorMsg string) {
 <div class="login-page">
   <div class="login-box">
     <h1 class="login-title">` + html.EscapeString(*siteName) + `</h1>
-    <p class="login-subtitle">Sign in</p>
+    <h2 class="login-subtitle">Sign in</h2>
     ` + errHTML + `
     <form method="POST" action="` + html.EscapeString(action) + `" class="login-form">
       <input type="hidden" name="fn" value="login">
@@ -141,9 +141,12 @@ func serveLoginPage(w http.ResponseWriter, r *http.Request, errorMsg string) {
       <input type="password" id="wfm_pass" name="wfm_pass" autocomplete="current-password" required>
       <button type="submit" name="login" value="1" class="btn btn-primary btn-block">Log in</button>
     </form>
+	<p style="margin-top: 2em;">
+    <a href="` + html.EscapeString(wfmPfx+"?fn=forgot") + `">Forgot your password?</a>
+	</p>
   </div>
   <div class="login-box">
-    Notice: the file manager uses cookies for logging in and out.
+    Notice: the file manager uses cookies for logging in and out.<br>
   </div>
 </div>
 </body>

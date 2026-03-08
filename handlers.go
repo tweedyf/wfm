@@ -37,6 +37,28 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Password reset flow is available without an existing session.
+	if r.FormValue("fn") == "forgot" {
+		if r.Method == http.MethodPost && r.FormValue("forgot") == "1" {
+			handleForgotPOST(w, r)
+		} else {
+			serveForgotPage(w, r, "")
+		}
+		return
+	}
+	if r.FormValue("fn") == "reset" {
+		if r.Method == http.MethodPost && r.FormValue("reset") == "1" {
+			handleResetPOST(w, r)
+		} else {
+			serveResetPage(w, r, "")
+		}
+		return
+	}
+	if r.FormValue("fn") == "confirm_email" {
+		handleConfirmEmail(w, r)
+		return
+	}
+
 	uName, uAccess := auth(w, r)
 	if uName == "" {
 		return
@@ -171,6 +193,10 @@ func wfmMain(w http.ResponseWriter, r *http.Request) {
 		logout(w, r)
 	case "chpass":
 		handleChpass(w, r, wfm)
+	case "email_settings":
+		serveEmailSettingsPage(w, r, wfm.userName, wfm.uDir, wfm.eSort, r.FormValue("email_error"), r.FormValue("email_success"))
+	case "update_email":
+		handleUpdateEmail(w, r, wfm)
 	case "about":
 		wfm.about(r.UserAgent())
 	default:

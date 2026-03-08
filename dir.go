@@ -33,7 +33,7 @@ func (r *wfmRequest) listFiles(hi string) {
 	sortFiles(d, &sl, r.eSort)
 
 	header(r.w, r.uDir, r.eSort, "", r.modern)
-	toolbars(r.w, r.uDir, r.userName, sl, i, r.rwAccess)
+	toolbars(r.w, r.uDir, r.userName, sl, i, r.rwAccess, r.eSort)
 	// Emit existing file names for client-side upload-replace confirmation
 	var existingFiles []string
 	for _, f := range d {
@@ -212,24 +212,28 @@ func (r *wfmRequest) listFiles(hi string) {
 // headerUserAndLogout returns HTML for the header: username (clickable to open change-password modal when not n/a) and logout link.
 func headerUserAndLogout(user string, i map[string]string, qeDir string) string {
 	escUser := html.EscapeString(user)
-	logoutLink := `<a href="` + wfmPfx + `?fn=logout" class="header-logout" title="Log out">` + i["tlogout"] + ` Logout <span class="btn-text">Logout</span></a>`
 	if user == "n/a" {
-		return `<span class="header-user">` + i["tid"] + escUser + `</span> ` + logoutLink
+		return `<span class="header-user">` + i["tid"] + escUser + `</span> `
 	}
-	return `<a href="#" id="headerChangePassword" class="header-user" title="Change password">` + i["tid"] + escUser + `</a> ` + logoutLink
+	return `<span class="header-user">` + i["tid"] + escUser + `</span> <a href="#" id="headerChangePassword" class="header-user" title="Change password">` + i["tpass"] + ` Change Password </a> `
 }
 
-func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[string]string, rw bool) {
+func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[string]string, rw bool, eSort string) {
 	eDir := html.EscapeString(uDir)
 	qeDir := url.PathEscape(uDir)
+	emailLink := ""
+	logoutLink := `<a href="` + wfmPfx + `?fn=logout" class="header-logout" title="Log out">` + i["tlogout"] + ` Logout <span class="btn-text">Logout</span></a>`
+	if emailSettingsEnabled() && user != "n/a" {
+		emailLink = `<a href="` + wfmPfx + `?fn=email_settings&amp;dir=` + qeDir + `&amp;sort=` + url.QueryEscape(eSort) + `" title="Email addresses">` + i["tem"] + ` Change Email</a> `
+	}
 	// Header
 	w.Write([]byte(`
 <header class="header">
     <div class="header-title">` + html.EscapeString(*siteName) + ` : ` + eDir + `</div>
     <div class="header-actions">
-        <span>` + i[rorw[rw]] + `</span>
-        ` + headerUserAndLogout(user, i, qeDir) + `
-        <a href="` + wfmPfx + `?fn=about&amp;dir=` + qeDir + `&amp;sort=">` + i["tve"] + ` WFM v` + vers + `</a>
+        <span>` + i[rorw[rw]] + `</span>` +
+		headerUserAndLogout(user, i, qeDir) + emailLink + logoutLink +
+		`<a href="` + wfmPfx + `?fn=about&amp;dir=` + qeDir + `&amp;sort=">` + i["tve"] + ` WFM v` + vers + `</a>
     </div>
 </header>
 `))
@@ -333,6 +337,8 @@ func icons(m bool) map[string]string {
 			"tul": fa("fa-upload") + " ",
 
 			"tid":     fa("fa-user") + " ",
+			"tpass":   fa("fa-key") + " ",
+			"tem":     fa("fa-envelope") + " ",
 			"tlogout": fa("fa-right-from-bracket") + " ",
 			"tve":     fa("fa-circle-info") + " ",
 
@@ -354,6 +360,8 @@ func icons(m bool) map[string]string {
 		"tho":     "~ ",
 		"tre":     "&reg; ",
 		"tid":     "User: ",
+		"tpass":   "Password: ",
+		"tem":     "Email: ",
 		"tlogout": "[logout] ",
 		"tve":     "WFM ",
 		"rw":      "[rw]",
