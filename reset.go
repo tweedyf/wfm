@@ -2,14 +2,17 @@ package main
 
 import (
 	"crypto/rand"
+	"crypto/tls"
 	"encoding/hex"
 	"fmt"
 	"html"
 	"log"
 	"math/big"
+	"net"
 	"net/http"
 	"net/smtp"
 	"net/url"
+	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
@@ -433,8 +436,8 @@ func handleResetPOST(w http.ResponseWriter, r *http.Request) {
 
 // sendPasswordResetEmail sends a reset link using the configured SMTP server.
 func sendPasswordResetEmail(email, username, token string) error {
-	if *smtpServer == "" || *smtpFrom == "" {
-		return fmt.Errorf("smtp_server or smtp_from not configured")
+	if !emailConfigured() {
+		return fmt.Errorf("email not configured: set sendmail_cmd or both smtp_server and smtp_from")
 	}
 	resetURL := wfmPfx + "?fn=reset&token=" + url.QueryEscape(token)
 	subject := fmt.Sprintf("[%s] Password reset", *siteName)
@@ -444,9 +447,82 @@ func sendPasswordResetEmail(email, username, token string) error {
 	return sendMail(*smtpServer, *smtpFrom, email, []byte(msg))
 }
 
-// sendMail is a small wrapper to send an email via the local SMTP server.
+// sendMail sends an email via the configured SMTP server.
+// When -smtp_insecure_skip_verify is set, TLS cert verification is skipped (for local/dev SMTP).
+// emailConfigured returns whether mail can be sent (sendmail_cmd or smtp_server+smtp_from).
+func emailConfigured() bool {
+	if *sendmailCmd != "" {
+		return *smtpFrom != ""
+	}
+	return *smtpServer != "" && *smtpFrom != ""
+}
+
 func sendMail(server, from, to string, msg []byte) error {
+	if *sendmailCmd != "" {
+		return sendMailViaSendmail(msg)
+	}
+	if *smtpInsecure {
+		return sendMailInsecure(server, from, to, msg)
+	}
 	return smtp.SendMail(server, nil, from, []string{to}, msg)
+}
+
+// sendMailViaSendmail runs the sendmail_cmd with -t and pipes the message to stdin.
+// The message must already contain To:, From:, Subject: headers.
+func sendMailViaSendmail(msg []byte) error {
+	cmd := exec.Command(*sendmailCmd, "-t")
+	cmd.Stdin = strings.NewReader(string(msg))
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		if len(out) > 0 {
+			return fmt.Errorf("%w: %s", err, out)
+		}
+		return err
+	}
+	return nil
+}
+
+// sendMailInsecure sends mail with TLS certificate verification disabled (for local SMTP).
+func sendMailInsecure(server, from, to string, msg []byte) error {
+	host, _, err := net.SplitHostPort(server)
+	if err != nil {
+		return fmt.Errorf("smtp server address: %w", err)
+	}
+	conn, err := net.Dial("tcp", server)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	client, err := smtp.NewClient(conn, host)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+	if err = client.Hello(host); err != nil {
+		return err
+	}
+	if ok, _ := client.Extension("STARTTLS"); ok {
+		if err = client.StartTLS(&tls.Config{InsecureSkipVerify: true}); err != nil {
+			return err
+		}
+	}
+	if err = client.Mail(from); err != nil {
+		return err
+	}
+	if err = client.Rcpt(to); err != nil {
+		return err
+	}
+	w, err := client.Data()
+	if err != nil {
+		return err
+	}
+	if _, err = w.Write(msg); err != nil {
+		return err
+	}
+	if err = w.Close(); err != nil {
+		return err
+	}
+	return client.Quit()
 }
 
 // Email confirmation for changing primary/secondary address.
@@ -500,8 +576,8 @@ func (s *emailConfirmStore) consume(token string) (emailConfirmEntry, bool) {
 }
 
 func sendEmailConfirmation(toEmail, username, slot, token string) error {
-	if *smtpServer == "" || *smtpFrom == "" {
-		return fmt.Errorf("smtp_server or smtp_from not configured")
+	if !emailConfigured() {
+		return fmt.Errorf("email not configured: set sendmail_cmd or both smtp_server and smtp_from")
 	}
 	confirmURL := wfmPfx + "?fn=confirm_email&token=" + url.QueryEscape(token)
 	subject := fmt.Sprintf("[%s] Confirm email address change", *siteName)
