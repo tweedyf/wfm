@@ -372,6 +372,12 @@ func serveResetPage(w http.ResponseWriter, r *http.Request, errorMsg string) {
     <form method="POST" action="` + html.EscapeString(wfmPfx) + `" class="login-form">
       <input type="hidden" name="fn" value="reset">
       <input type="hidden" name="token" value="` + html.EscapeString(token) + `">
+      <label for="suggested_pass">Suggested password</label>
+      <div class="password-suggest-row">
+        <input type="text" id="suggested_pass" class="suggested-password" readonly value="` + html.EscapeString(suggested) + `" aria-label="Suggested password (read-only, use Copy to copy)">
+        <button type="button" class="btn btn-copy" onclick="navigator.clipboard.writeText(document.getElementById('suggested_pass').value).then(function(){this.textContent='Copied';var b=this;setTimeout(function(){b.textContent='Copy';},1500);}.bind(this))" title="Copy to clipboard">Copy</button>
+      </div>
+      <p class="login-hint">The fields below are prefilled with this password. You can keep it or type your own.</p>
       <label for="new_pass">New password</label>
       <input type="password" id="new_pass" name="new_pass" autocomplete="new-password" required minlength="8" value="` + html.EscapeString(suggested) + `">
       <label for="confirm_pass">Confirm new password</label>
