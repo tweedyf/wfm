@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/smtp"
 	"net/url"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -434,12 +435,20 @@ func handleResetPOST(w http.ResponseWriter, r *http.Request) {
 	redirect(w, wfmPfx)
 }
 
+// emailBaseURL returns the base URL for links in outgoing email (scheme+host+path if public_url set, else path only).
+func emailBaseURL() string {
+	if *publicUrl != "" {
+		return strings.TrimSuffix(*publicUrl, "/")
+	}
+	return strings.TrimSuffix(wfmPfx, "/")
+}
+
 // sendPasswordResetEmail sends a reset link using the configured SMTP server.
 func sendPasswordResetEmail(email, username, token string) error {
 	if !emailConfigured() {
 		return fmt.Errorf("email not configured: set sendmail_cmd or both smtp_server and smtp_from")
 	}
-	resetURL := wfmPfx + "?fn=reset&token=" + url.QueryEscape(token)
+	resetURL := emailBaseURL() + "?fn=reset&token=" + url.QueryEscape(token)
 	subject := fmt.Sprintf("[%s] Password reset", *siteName)
 	body := fmt.Sprintf("Hello %s,\n\nA password reset was requested for your account on %s.\n\nTo choose a new password, open this link in your browser:\n\n%s\n\nIf you did not request this, you can ignore this message.\n", username, *siteName, resetURL)
 	msg := fmt.Sprintf("To: %s\r\nFrom: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n%s", email, *smtpFrom, subject, body)
@@ -584,7 +593,7 @@ func sendEmailConfirmation(toEmail, username, slot, token string) error {
 	if !emailConfigured() {
 		return fmt.Errorf("email not configured: set sendmail_cmd or both smtp_server and smtp_from")
 	}
-	confirmURL := wfmPfx + "?fn=confirm_email&token=" + url.QueryEscape(token)
+	confirmURL := emailBaseURL() + "?fn=confirm_email&token=" + url.QueryEscape(token)
 	subject := fmt.Sprintf("[%s] Confirm email address change", *siteName)
 	body := fmt.Sprintf("Hello %s,\n\nYou requested to set this address as your %s email for %s.\n\nTo confirm, open this link in your browser:\n\n%s\n\nIf you did not request this, you can ignore this message.\n", username, slot, *siteName, confirmURL)
 	msg := fmt.Sprintf("To: %s\r\nFrom: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8\r\n\r\n%s", toEmail, *smtpFrom, subject, body)
