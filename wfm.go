@@ -44,7 +44,7 @@ var (
 	smtpServer   = flag.String("smtp_server", "127.0.0.1:25", "SMTP server for password reset and confirmation emails (ignored if sendmail_cmd is set)")
 	smtpFrom    = flag.String("smtp_from", "wfm@localhost", "From address for password reset and confirmation emails (set in flags or wfm.conf)")
 	smtpInsecure = flag.Bool("smtp_insecure_skip_verify", false, "skip TLS certificate verification for SMTP (use for local/dev servers with self-signed or hostname-only certs)")
-	sendmailCmd  = flag.String("sendmail_cmd", "", "if set, use this command to send mail instead of SMTP (e.g. sendmail or /usr/sbin/sendmail; message piped to stdin with -t)")
+	sendmailCmd  = flag.String("sendmail_cmd", "sendmail", "command to send mail (message piped to stdin with -t); set to empty string to use smtp_server instead")
 	aboutRnt   = flag.Bool("about_runtime", true, "Display runtime info in About Dialog")
 	showDot    = flag.Bool("show_dot", false, "show dot files and folders")
 	listArc    = flag.Bool("list_archive_contents", false, "list contents of archives (expensive!)")
