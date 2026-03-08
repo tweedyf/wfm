@@ -472,6 +472,11 @@ func sendMail(server, from, to string, msg []byte) error {
 func sendMailViaSendmail(msg []byte) error {
 	cmd := exec.Command(*sendmailCmd, "-t")
 	cmd.Stdin = strings.NewReader(string(msg))
+	// Ensure /usr/sbin (OpenBSD sendmail) and common locations are in PATH when using "sendmail".
+	if *sendmailCmd == "sendmail" {
+		path := os.Getenv("PATH")
+		cmd.Env = append(os.Environ(), "PATH=/usr/sbin:/usr/bin:/opt/homebrew/sbin:/opt/homebrew/bin:/usr/local/sbin:/usr/local/bin:"+path)
+	}
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		if len(out) > 0 {
