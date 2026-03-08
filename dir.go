@@ -222,7 +222,9 @@ func toolbars(w http.ResponseWriter, uDir, user string, sl []string, i map[strin
 	eDir := html.EscapeString(uDir)
 	qeDir := url.PathEscape(uDir)
 	emailLink := ""
-	logoutLink := `<a href="` + wfmPfx + `?fn=logout" class="header-logout" title="Log out">` + i["tlogout"] + ` Logout <span class="btn-text">Logout</span></a>`
+	logoutLink := `<form method="POST" action="` + html.EscapeString(wfmPfx) + `" class="header-logout-form" style="display:inline;">` +
+		`<input type="hidden" name="fn" value="logout">` +
+		`<button type="submit" class="header-logout" title="Log out">` + i["tlogout"] + ` Logout <span class="btn-text">Logout</span></button></form>`
 	if emailSettingsEnabled() && user != "n/a" {
 		emailLink = `<a href="` + wfmPfx + `?fn=email_settings&amp;dir=` + qeDir + `&amp;sort=` + url.QueryEscape(eSort) + `" title="Email addresses">` + i["tem"] + ` Change Email</a> `
 	}
