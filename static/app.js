@@ -192,6 +192,24 @@
     }
   }
 
+  function initLogoutLink() {
+    var link = document.getElementById('headerLogout');
+    if (!link) return;
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = link.href.split('?')[0];
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'fn';
+      input.value = 'logout';
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    });
+  }
+
   function initChangePasswordModal() {
     var trigger = document.getElementById('headerChangePassword');
     var modal = document.getElementById('changePasswordModal');
@@ -262,12 +280,14 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
       initUploadReplaceModal();
+      initLogoutLink();
       initChangePasswordModal();
       initDragDrop();
       initCheckboxes();
     });
   } else {
     initUploadReplaceModal();
+    initLogoutLink();
     initChangePasswordModal();
     initDragDrop();
     initCheckboxes();

@@ -85,28 +85,8 @@ a:hover {
   cursor: pointer;
 }
 
-.header-logout-form {
-  display: inline;
-}
-
-.header-logout,
-.header-actions .header-logout {
+.header-logout {
   margin-left: 0.5rem;
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  font: inherit;
-  border-radius: var(--radius);
-}
-
-.header-actions .header-logout {
-  color: white;
-}
-
-.header-actions .header-logout:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
 
 .header-actions span {
@@ -622,14 +602,12 @@ body.drag-over .drop-overlay {
 }
 
 @media (max-width: 768px) {
-	.header-actions a,
-	.header-actions .header-logout {
+	.header-actions a {
 		font-size: 1px;
 		visibility: hidden;
 	}
 	
-	.header-actions a i,
-	.header-actions .header-logout i {
+	.header-actions a i {
 		font-size: large;
 		visibility: initial;
 	}
